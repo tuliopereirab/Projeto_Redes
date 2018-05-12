@@ -18,7 +18,7 @@ void loopErro();
 void opQuit(int cliente){
     int statusFinalizar;
     char msgEnvia[100];
-    strcpy(msgEnvia, "221 finalizando conexao\n");
+    strcpy(msgEnvia, "221 Finalizando conexao\n");
     write(cliente, msgEnvia, strlen(msgEnvia)+1);
     statusFinalizar = finalizarConexao();
     if(statusFinalizar != 0){
@@ -46,8 +46,8 @@ int opPort(char portas[]){
     j=0;
     while(portas[i] != ',')
         aux[j++] = portas[i++];
-    
-    
+
+
     printf("aux: %s\n", aux);
     porta = atoi(aux);
     printf("Porta: %i\n", porta);
@@ -56,14 +56,14 @@ int opPort(char portas[]){
 
 int opLs(int cliente, int port, char ipCliente[]){
     printf("LIST solicitado\n");
-    
+
     struct stat obj;
     int dataCon;
     int tamanho;
     int arquivo;
     char msgEnvia[100];
     FILE *arq;
-    
+
     dataCon = iniciarConexaoDados(cliente, port, ipCliente);
     if(dataCon == 0){
         return 0;
@@ -74,7 +74,7 @@ int opLs(int cliente, int port, char ipCliente[]){
         write(cliente, &tamanho, sizeof(int));
         arquivo = open("temp.txt", O_RDONLY);
         sendfile(dataCon, arquivo, NULL, tamanho);
-        strcpy(msgEnvia, "250 arquivo enviado\n");
+        strcpy(msgEnvia, "250 Arquivo enviado\n");
         write(cliente, msgEnvia, strlen(msgEnvia)+1);
         close(dataCon);
         printf("LIST enviado\n");
@@ -111,8 +111,8 @@ int opPasv(int cliente, int port, char ipCliente[]){
     }
     sprintf(p1, "%i", port+1);
     sprintf(p2, "%i", port+2);
-    
-    
+
+
     if((strlen(h1)) > 3)
         for(i=3; i<strlen(h1); i++)
             h1[i] = NULL;
@@ -125,7 +125,7 @@ int opPasv(int cliente, int port, char ipCliente[]){
     if((strlen(h4)) > 3)
         for(i=3; i<strlen(h4); i++)
             h4[i] = NULL;
-    
+
     for(i=0; i<3; i++){
         if((h1[i] != '0') && (h1[i] != '1') && (h1[i] != '2') && (h1[i] != '3') && (h1[i] != '4') && (h1[i] != '5') && (h1[i] != '6') && (h1[i] != '7') && (h1[i] != '8') && (h1[i] != '9'))
             h1[i] = NULL;
@@ -136,9 +136,9 @@ int opPasv(int cliente, int port, char ipCliente[]){
         if((h4[i] != '0') && (h4[i] != '1') && (h4[i] != '2') && (h4[i] != '3') && (h4[i] != '4') && (h4[i] != '5') && (h4[i] != '6') && (h4[i] != '7') && (h4[i] != '8') && (h4[i] != '9'))
             h4[i] = NULL;
     }
-    
+
     printf("h1: %s\nh2: %s\nh3: %s\nh4: %s\np1: %s\np2: %s\n", h1, h2, h3, h4, p1, p2);
-    strcpy(msgEnviar, "227 entrando em modo passivo (");
+    strcpy(msgEnviar, "227 Entrando em modo passivo (");
     strcat(msgEnviar, h1);
     strcat(msgEnviar, ",");
     strcat(msgEnviar, h2);
@@ -151,10 +151,10 @@ int opPasv(int cliente, int port, char ipCliente[]){
     strcat(msgEnviar, ",");
     strcat(msgEnviar, p2);
     strcat(msgEnviar, ")\n");
-    
+
     printf("MENSAGEM ENVIAR: %s\n", msgEnviar);
     write(cliente, msgEnviar, strlen(msgEnviar)+1);
-    
+
     return 1;
 }
 
@@ -163,7 +163,7 @@ int opDir(int cliente){
 }
 
 int opLsLa(int cliente){
-   return 1; 
+   return 1;
 }
 
 int opCwd(int cliente, char pasta[]){
@@ -214,14 +214,14 @@ int opPut(int cliente){
         read(cliente, nomeArquivo, 25);
         printf("PUT recebendo arquivo \'%s\'\n", nomeArquivo);
         read(cliente, &tamanho, sizeof(int));
-        
+
         arquivo = malloc(tamanho);
         read(cliente, arquivo, tamanho);
-        
+
         fileh = open(nomeArquivo, O_CREAT | O_EXCL | O_WRONLY, 0666);
         write(fileh, arquivo, tamanho, 0);
         close(fileh);
-        
+
         printf("PUT arquivo recebido\n");
         return 1;
     }else{
@@ -250,16 +250,16 @@ int opGet(int cliente){
     }
     printf("GET enviando arquivo \'%s\'\n", nomeArquivo);
     stat(nomeArquivo, &obj);
-    
+
     arquivo = open(nomeArquivo, O_RDONLY);
     tamanho = obj.st_size;
-    
+
     if(arquivo == 1)
         tamanho = 0;
     write(cliente, &tamanho, sizeof(int));
     if(tamanho)
         sendfile(cliente, arquivo, NULL, tamanho);
-    
+
     printf("GET arquivo enviado\n");
     return 1;
 }
@@ -273,7 +273,7 @@ int opPwd(int cliente){
     char msgEnvia[100];
     int arquivo;
     FILE *arq;
-    
+
     system("pwd >temp.txt");
 
     arq = fopen("temp.txt", "r");
@@ -281,8 +281,8 @@ int opPwd(int cliente){
     while((endereco[i] = fgetc(arq)) != EOF)
         i++;
     endereco[i] = NULL;
-    fclose(arq); 
-    
+    fclose(arq);
+
     strcpy(msgEnvia, "257 ");
     strcat(msgEnvia, endereco);
     write(cliente, msgEnvia, strlen(msgEnvia)+1);
@@ -294,7 +294,7 @@ int opPwd(int cliente){
 int opRmd(int cliente, char pasta[]){
     printf("RMD solicitado\n");
     char msgEnvia[100];
-    
+
     printf("RMD pasta \'%s\'\n", pasta);
         printf("RMD confirmado pelo usuário na pasta \'%s\'\n", pasta);
         if(rmdir(pasta) == 0){
@@ -313,7 +313,7 @@ int opRmd(int cliente, char pasta[]){
 int opMkd(int cliente, char pasta[]){
     printf("MKD solicitado\n");
     char msgEnvia[100];
-    
+
     printf("MKD pasta \'%s\'\n", pasta);
 
     if(mkdir(pasta, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH) == 0){
@@ -333,9 +333,9 @@ int opDele(int cliente, char arquivo[]){
     printf("DELE solicitado\n");
     char msgEnvia[100];
     char confirm[5];
-    
+
     printf("DELE arquivo \'%s\'\n", arquivo);
-    
+
     if(remove(arquivo) == 0){
         printf("DELE arquivo \'%s\' deletado com sucesso\n", arquivo);
         strcpy(msgEnvia, "250 deletado com sucesso\n");   // confirmação de apagado

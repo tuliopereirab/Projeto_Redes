@@ -23,8 +23,6 @@ int carregarClientes();
 int logar(char nome[], char senha[]);
 int opLs(int cliente, int port, char ipCliente[]);
 void opQuit(int cliente);
-int opDir(int cliente);
-int opLsLa(int cliente);
 int opCwd(int cliente, char pasta[]);
 int opCwdPonto(int cliente);
 int opPut(int cliente);
@@ -105,7 +103,6 @@ int main(){
         printf("Conexão solicitada\n");
         strcpy(msgEnviar, "220 Servico pronto\n");
         write(client_s, msgEnviar, strlen(msgEnviar)+1);
-        printf("aqui1\n");
         conversa(client_s);
         close(client_s);
         printf("Conexao finalizada\n");
@@ -124,7 +121,8 @@ void conversa(int cliente){
 
 
     do{
-        strcpy(msgRecebe, " ");
+        for(i=0;i<100; i++)
+            msgRecebe[i] = NULL;
         read(cliente, msgRecebe, MAXBUF);
 
         printf("RECEBE: %s\n", msgRecebe);
@@ -143,10 +141,6 @@ void conversa(int cliente){
             if(statusLogin == 1){
                 if((strcmp(comando, "LIST")) == 0)
                     op = 1;
-                else if((strcmp(comando, "dir")) == 0)
-                    op = 2;
-                else if((strcmp(comando, "ls -la")) == 0)
-                    op = 3;
                 else if((strcmp(comando, "CWD")) == 0)
                     op = 4;
                 else if((strcmp(comando, "CDUP")) == 0)
@@ -180,12 +174,6 @@ void conversa(int cliente){
         switch(op){
             case 1:
                 status = opLs(cliente, port, ipCliente);
-                break;
-            case 2:
-                status = opDir(cliente);
-                break;
-            case 3:
-                status = opLsLa(cliente);
                 break;
             case 4:
                 status = opCwd(cliente, parametro);
@@ -227,7 +215,9 @@ void conversa(int cliente){
                     op = 99;
                 break;
             case 41:
+                printf("SYST solicitado\n");
                 strcpy(msgEnvia, "215 UNIX\n");
+                printf("SYST enviado: UNIX\n");
                 write(cliente, msgEnvia, strlen(msgEnvia)+1);
                 break;
             case 50:
@@ -314,8 +304,13 @@ int opUser(int cliente){
 
     if(status == 1){
         pasta = 0;
-        strcpy(msgEnvia, "230 usuario logado\n");
-        write(cliente, msgEnvia, strlen(msgEnvia)+1);
+        if(statusLogin == 1){
+            strcpy(msgEnvia, "230 Usuario logado com sucesso\n");
+            write(cliente, msgEnvia, strlen(msgEnvia)+1);
+        }else if(statusLogin == 2){
+            strcpy(msgEnvia, "230 Usuario cadastrado com sucesso\n");
+            write(cliente, msgEnvia, strlen(msgEnvia)+1);
+        }
         return 1;
     }else{
         if(status == 10){
@@ -347,30 +342,15 @@ int opUser(int cliente){
 }
 
 void encontrarComando(char msg[]){
-    int i, z=0;
+    int i;
     for(i=0; i<4; i++){
-        if(msg[i] == 'P')
-            z++;
-        if(msg[i] == 'W')
-            z++;
-        if(msg[i] == 'D')
-            z++;
-        else
-            z--;
         comando[i] = NULL;
         if(msg[i] != ' ')
             comando[i] = msg[i];
         else
             comando[i] = '\0';
     }
-    i--;
-
-    printf("Valor z: %i\n", z);
-    if(z == 3)
-        strcpy(comando, "PWD ");
-
-
-
+    comando[4] = '\0';
     printf("Comando: %s\n", comando);
 }
 
@@ -378,14 +358,17 @@ void encontrarParametro(char msg[]){
     int i, j=0;
     int stat = 1;
     int tam = strlen(msg);
-    parametro[0] = '\0';
 
-    i = strlen(comando);
+    for(i=0; i<20; i++)
+        parametro[i] = NULL;
+
+    i = strlen(comando)+1;
     while(i<(tam-2)){
         parametro[j] = msg[i];
         i++;
         j++;
     }
+    parametro[j] = '\0';
 
 
     printf("Parametro: %s\n", parametro);
@@ -419,8 +402,6 @@ int finalizarConexao(){
     }
 
 }
-
-
 
 
 void loopErro(){
