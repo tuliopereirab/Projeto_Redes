@@ -1,0 +1,27 @@
+Comandos FTP:
+
+0 - erro
+1 - LIST - listagem simples de arquivos
+2 - dir - listagem com informações mais completas sobre os arquivo (tamanho em bytes, data de alteração e nome do arquivo)
+3 - ls -la - igual ao dir mas lista tbm arquivos ocultos
+4 - CWD [nome do diretorio] - acessar um diretorio
+5 - CDUP         - retornar para o diretório acima
+6 - PWD - envia o caminho do diretorio atual
+
+10 - STOR [local do arquivo]  - upload pro servidor
+11 - RETR [nome do arquivo]  - download do servidor
+
+20 - RMD - rmdir
+21 - MKD - mkdir
+
+30 - DELE - deletar arquivo FALTA IMPLEMENTAR
+
+40 - USER
+41 - SYST
+50 - PORT
+51 - PASV
+
+88 - usuário precisa de login
+
+
+99 - QUIT
