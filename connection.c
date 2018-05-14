@@ -11,7 +11,7 @@
 #include <fcntl.h>
 
 
-int iniciarConexaoDados(int cliente, int port, int port2, char ipCliente[]){
+int iniciarConexaoDados(int cliente, int port, char ipCliente[]){
     int dataCon;
     char msgEnvia[100];
     int status;
@@ -25,12 +25,6 @@ int iniciarConexaoDados(int cliente, int port, int port2, char ipCliente[]){
     inet_aton(ipCliente, &dest.sin_addr.s_addr);
     printf("CONEXAO iniciando conexao de dados com cliente %s:%i\n", ipCliente, port);
     status = connect(dataCon, (struct sockaddr *)&dest, sizeof(dest));
-    if(status != 0){
-        printf("CONEXAO primeira porta falhou\n");
-        dest.sin_port = htons(port);
-        printf("CONEXAO iniciando conexao de dados com cliente %s:%i\n", ipCliente, port2);        
-        status = connect(dataCon, (struct sockaddr *)&dest, sizeof(dest));
-    }
 
     if(status == 0){
         printf("CONEXAO conexao de dados estabelecida com cliente\n");

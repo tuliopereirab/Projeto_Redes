@@ -11,7 +11,7 @@
 
 #define MAXBUF 100
 
-int iniciarConexaoDados(int cliente, int port, int port2, char ipCliente[]);
+int iniciarConexaoDados(int cliente, int port, char ipCliente[]);
 void finalizarSessao();
 void loopErro();
 
@@ -33,36 +33,31 @@ void opQuit(int cliente){
     printf("Finalizando conexao: pedido cliente\n");
 }
 
-int opPort(char portas[], int set){
+int opPort(char portas[]){
     int i, j;
     int porta, tam;
     char aux[20];
     i = 0, j=0;
     printf("AQUI CHEGOU!\n: %s", portas);
     tam = strlen(portas);
-    while((i<tam) && (j<(4+set))){
+    while((i<tam) && (j<4)){
         if(portas[i] == ',')
             j++;
         i++;
     }
 
     j=0;
-    if(set == 0)
-        while(portas[i] != ',')
-            aux[j++] = portas[i++];
-    else{
-        tam = strlen(portas);
-        printf("Tamanho: %i\n", tam);
-        while(i < tam)
-            aux[j++] = portas[i++];
-    }
-    printf("\naux[%i]: %s\n", set, aux);
+
+    while(portas[i] != ',')
+        aux[j++] = portas[i++];
+
+    printf("\naux: %s\n", aux);
     porta = atoi(aux);
     printf("Porta: %i\n", porta);
     return porta;
 }
 
-int opLs(int cliente, int port, int port2, char ipCliente[]){
+int opLs(int cliente, int port, char ipCliente[]){
     printf("LIST solicitado\n");
 
     struct stat obj;
@@ -72,7 +67,7 @@ int opLs(int cliente, int port, int port2, char ipCliente[]){
     char msgEnvia[100];
     FILE *arq;
 
-    dataCon = iniciarConexaoDados(cliente, port, port2, ipCliente);
+    dataCon = iniciarConexaoDados(cliente, port, ipCliente);
     if(dataCon == 0){
         return 0;
     }else{
@@ -232,7 +227,7 @@ int opPut(int cliente){
     }
 }
 
-int opGet(int cliente, char ipCliente[], int port, int port2, char nomeArquivo[]){
+int opGet(int cliente, char ipCliente[], int port, char nomeArquivo[]){
     printf("GET solicitado\n");
     char msgEnvia[100];
     struct stat obj;
@@ -247,7 +242,7 @@ int opGet(int cliente, char ipCliente[], int port, int port2, char nomeArquivo[]
         return 0;
     }
 
-    dataCon = iniciarConexaoDados(cliente, port, port2, ipCliente);
+    dataCon = iniciarConexaoDados(cliente, port, ipCliente);
 
     if(dataCon == 0){
         printf("ERRO na conexao de dados, RECV finalizado\n");

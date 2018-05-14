@@ -23,17 +23,17 @@ int finalizarConexao();
 int carregarClientes();
 int logar(char nome[], char senha[]);
 void finalizarSessao();
-int opLs(int cliente, int port, int port2, char ipCliente[]);
+int opLs(int cliente, int port, char ipCliente[]);
 void opQuit(int cliente);
 int opCwd(int cliente, char pasta[]);
 int opCwdPonto(int cliente);
 int opPut(int cliente);
-int opGet(int cliente, char ipCliente[], int port, int port2, char nomeArquivo[]);
+int opGet(int cliente, char ipCliente[], int port, char nomeArquivo[]);
 int opPwd(int cliente);
 int opRmd(int cliente, char pasta[]);
 int opMkd(int cliente, char pasta[]);
 int opDele(int cliente, char arquivo[]);
-int opPort(char portas[], int set);
+int opPort(char portas[]);
 //-------------------
 // INTERNAS
 void encontrarComando(char msg[]);
@@ -49,7 +49,7 @@ int statusLogin=0;
 int statusServidor = 0;
 char parametro[20];
 char comando[5];
-int port = PORTA+1, port2 = PORTA+2; // PORT = PORTA DADOS; PORTA = PORTA CONTROLE
+int port = PORTA+1; // PORT = PORTA DADOS; PORTA = PORTA CONTROLE
 int s;
 struct sockaddr_in client;
 int addrlen;
@@ -175,7 +175,7 @@ void conversa(int cliente){
 
         switch(op){
             case 1:
-                status = opLs(cliente, port, port2, ipCliente);
+                status = opLs(cliente, port, ipCliente);
                 break;
             case 4:
                 status = opCwd(cliente, parametro);
@@ -200,7 +200,7 @@ void conversa(int cliente){
                 status = opPut(cliente);
                 break;
             case 11:
-                status = opGet(cliente, ipCliente, port, port2, parametro);
+                status = opGet(cliente, ipCliente, port, parametro);
                 break;
             case 20:
                 status = opRmd(cliente, parametro);
@@ -223,9 +223,8 @@ void conversa(int cliente){
                 write(cliente, msgEnvia, strlen(msgEnvia)+1);
                 break;
             case 50:
-                port = opPort(parametro, 0);
-                port2 = opPort(parametro, 1);
-                printf("PORT portas redefidas para %i e %i\n", port, port2);
+                port = opPort(parametro);
+                printf("PORT porta redefida para %i\n", port);
                 strcpy(msgEnvia, "200 porta redefinida\n");
                 write(cliente, msgEnvia, strlen(msgEnvia)+1);
                 break;
