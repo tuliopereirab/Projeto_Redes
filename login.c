@@ -15,10 +15,11 @@ struct clientes{
 
 struct clientes *listaClientes;
 int nClientes;
+int idCliente; // posição do vetor do cliente que conseguiu login; Para ser usado para finalizar a conexão
 
 int carregarClientes(){
     FILE *arq;
-    
+
     int i;
     arq = fopen("clientesCadastrados.txt", "r");
     if(arq == NULL){
@@ -38,20 +39,24 @@ int logar(char nome[], char senha[]){
     int i, status = 0;
     FILE *arq;
     i = 0;
-    
-    
+
+
     while(i < nClientes){
         if((strcmp(listaClientes[i].nome, nome)) == 0){
             if((strcmp(listaClientes[i].senha, senha)) == 0){
-                listaClientes[nClientes-1].status = 1;
-                return 1; // 1 = cliente logado com sucesso
+                if(listaClientes[i].status == 0){
+                    listaClientes[nClientes-1].status = 1;
+                    idCliente = i;
+                    return 1; // 1 = cliente logado com sucesso
+                }else
+                    return 10;  // 10 = cliente já logado
             }else
                 return 0;  // 0 = senha incorreta
         }
         i++;
     }
-    
-    
+
+
     printf("LOGIN cliente não encontrado\n");
     status = cadastrar(nome, senha);
     return status;
@@ -61,20 +66,20 @@ int cadastrar(char nome[], char senha[]){
     FILE *arq;
     int i;
     nClientes++;
-    
-    
+
+
     listaClientes = realloc(listaClientes, sizeof(struct clientes) * nClientes);
-    
+
     strcpy(listaClientes[nClientes-1].nome, nome);
     strcpy(listaClientes[nClientes-1].senha, senha);
     listaClientes[nClientes-1].status = 1;
-    
-    
+
+
     system("rm clientesCadastrados.txt");
     printf("LOGIN cadastrado com sucesso\n");
-    
+
     arq = fopen("clientesCadastrados.txt", "w");
-    
+
     fprintf(arq, "%d\n", nClientes);
     for(i=0; i<nClientes; i++){
         fprintf(arq, "%s\t%s", listaClientes[i].nome, listaClientes[i].senha);
@@ -85,9 +90,15 @@ int cadastrar(char nome[], char senha[]){
     }
     printf("LOGIN lista de clientes atualizada\n");
     fclose(arq);
-    
+
     strcpy(listaClientes[nClientes-1].nome, nome);
     strcpy(listaClientes[nClientes-1].senha, senha);
-    
+
     return 2; // 2 - cliente cadastrado com sucesso
+}
+
+void finalizarSessao(){
+    listaClientes[idCliente].status = 0;
+    printf("Cliente \'%s\' agora está offline\n", listaClientes[idCliente].nome);
+    return 1;
 }

@@ -10,6 +10,7 @@
 #include <sys/sendfile.h>
 #include <fcntl.h>
 
+
 #define PORTA 8080
 #define MAXBUF 100
 
@@ -21,17 +22,18 @@ int finalizarConexao();
 // EXTERNAS
 int carregarClientes();
 int logar(char nome[], char senha[]);
-int opLs(int cliente, int port, char ipCliente[]);
+void finalizarSessao();
+int opLs(int cliente, int port, int port2, char ipCliente[]);
 void opQuit(int cliente);
 int opCwd(int cliente, char pasta[]);
 int opCwdPonto(int cliente);
 int opPut(int cliente);
-int opGet(int cliente);
+int opGet(int cliente, char ipCliente[], int port, int port2, char nomeArquivo[]);
 int opPwd(int cliente);
 int opRmd(int cliente, char pasta[]);
 int opMkd(int cliente, char pasta[]);
 int opDele(int cliente, char arquivo[]);
-int opPort(char portas[]);
+int opPort(char portas[], int set);
 //-------------------
 // INTERNAS
 void encontrarComando(char msg[]);
@@ -47,7 +49,7 @@ int statusLogin=0;
 int statusServidor = 0;
 char parametro[20];
 char comando[5];
-int port = PORTA+1; // PORT = PORTA DADOS; PORTA = PORTA CONTROLE
+int port = PORTA+1, port2 = PORTA+2; // PORT = PORTA DADOS; PORTA = PORTA CONTROLE
 int s;
 struct sockaddr_in client;
 int addrlen;
@@ -173,7 +175,7 @@ void conversa(int cliente){
 
         switch(op){
             case 1:
-                status = opLs(cliente, port, ipCliente);
+                status = opLs(cliente, port, port2, ipCliente);
                 break;
             case 4:
                 status = opCwd(cliente, parametro);
@@ -198,7 +200,7 @@ void conversa(int cliente){
                 status = opPut(cliente);
                 break;
             case 11:
-                status = opGet(cliente);
+                status = opGet(cliente, ipCliente, port, port2, parametro);
                 break;
             case 20:
                 status = opRmd(cliente, parametro);
@@ -211,7 +213,7 @@ void conversa(int cliente){
                 break;
             case 40:
                 statusLogin = opUser(cliente);
-                if(statusLogin == 99)
+                if((statusLogin == 99) || (statusLogin == 0))
                     op = 99;
                 break;
             case 41:
@@ -221,8 +223,9 @@ void conversa(int cliente){
                 write(cliente, msgEnvia, strlen(msgEnvia)+1);
                 break;
             case 50:
-                port = opPort(parametro);
-                printf("PORT porta redefida para %i\n", port);
+                port = opPort(parametro, 0);
+                port2 = opPort(parametro, 1);
+                printf("PORT portas redefidas para %i e %i\n", port, port2);
                 strcpy(msgEnvia, "200 porta redefinida\n");
                 write(cliente, msgEnvia, strlen(msgEnvia)+1);
                 break;
@@ -286,6 +289,9 @@ int opUser(int cliente){
     }else if(statusLogin == 0){
         printf("Senha para \'%s\' incorreta\n", usernameCliente);
         status = 40;
+    }else if(statusLogin == 10){
+        printf("Cliente \'%s\' já está logado\n", usernameCliente);
+        status = 50;
     }else{
         printf("Erro desconhecido\n");
         status = 50;
@@ -332,6 +338,10 @@ int opUser(int cliente){
             write(cliente, msgEnvia, strlen(msgEnvia)+1);
             printf("Senha incorreta!\n");
             return 0;
+        }else if(status == 50){
+            strcpy(msgEnvia, "501 cliente ja esta logado\n");
+            write(cliente, msgEnvia, strlen(msgEnvia)+1);
+            printf("Cliente \'%s\' já está logado\n", usernameCliente);
         }else{
             strcpy(msgEnvia, "421 erro desconhecido\n");
             write(cliente, msgEnvia, strlen(msgEnvia)+1);
@@ -402,7 +412,6 @@ int finalizarConexao(){
     }
 
 }
-
 
 void loopErro(){
     char msgEnvia[100];

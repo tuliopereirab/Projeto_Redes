@@ -11,7 +11,8 @@
 
 #define MAXBUF 100
 
-int iniciarConexaoDados(int cliente, int port, char ipCliente[]);
+int iniciarConexaoDados(int cliente, int port, int port2, char ipCliente[]);
+void finalizarSessao();
 void loopErro();
 
 
@@ -20,6 +21,7 @@ void opQuit(int cliente){
     char msgEnvia[100];
     strcpy(msgEnvia, "221 Finalizando conexao\n");
     write(cliente, msgEnvia, strlen(msgEnvia)+1);
+    finalizarSessao();
     statusFinalizar = finalizarConexao();
     if(statusFinalizar != 0){
         printf("Erro ao finalizar conexão: pasta raiz não pode ser retornada\nFINALIZANDO SERVIDOR!\n");
@@ -31,30 +33,36 @@ void opQuit(int cliente){
     printf("Finalizando conexao: pedido cliente\n");
 }
 
-int opPort(char portas[]){
+int opPort(char portas[], int set){
     int i, j;
     int porta, tam;
     char aux[20];
     i = 0, j=0;
     printf("AQUI CHEGOU!\n: %s", portas);
     tam = strlen(portas);
-    while((i<tam) && (j<4)){
+    while((i<tam) && (j<(4+set))){
         if(portas[i] == ',')
             j++;
         i++;
     }
+
     j=0;
-    while(portas[i] != ',')
-        aux[j++] = portas[i++];
-
-
-    printf("aux: %s\n", aux);
+    if(set == 0)
+        while(portas[i] != ',')
+            aux[j++] = portas[i++];
+    else{
+        tam = strlen(portas);
+        printf("Tamanho: %i\n", tam);
+        while(i < tam)
+            aux[j++] = portas[i++];
+    }
+    printf("\naux[%i]: %s\n", set, aux);
     porta = atoi(aux);
     printf("Porta: %i\n", porta);
     return porta;
 }
 
-int opLs(int cliente, int port, char ipCliente[]){
+int opLs(int cliente, int port, int port2, char ipCliente[]){
     printf("LIST solicitado\n");
 
     struct stat obj;
@@ -64,7 +72,7 @@ int opLs(int cliente, int port, char ipCliente[]){
     char msgEnvia[100];
     FILE *arq;
 
-    dataCon = iniciarConexaoDados(cliente, port, ipCliente);
+    dataCon = iniciarConexaoDados(cliente, port, port2, ipCliente);
     if(dataCon == 0){
         return 0;
     }else{
@@ -158,13 +166,6 @@ int opPasv(int cliente, int port, char ipCliente[]){
     return 1;
 }
 
-int opDir(int cliente){
-    return 1;
-}
-
-int opLsLa(int cliente){
-   return 1;
-}
 
 int opCwd(int cliente, char pasta[]){
     int status;
@@ -231,23 +232,28 @@ int opPut(int cliente){
     }
 }
 
-int opGet(int cliente){
+int opGet(int cliente, char ipCliente[], int port, int port2, char nomeArquivo[]){
     printf("GET solicitado\n");
     char msgEnvia[100];
-    char nomeArquivo[25];
     struct stat obj;
     int arquivo, tamanho;
-    read(cliente, nomeArquivo, 25);
+    int dataCon;
+
     if(fopen(nomeArquivo, "r+") == NULL){
-        strcpy(msgEnvia, "error");
+        strcpy(msgEnvia, "550 Arquivo inexistente\n");
         write(cliente, msgEnvia, strlen(msgEnvia)+1);
         printf("GET status = \'%s\' enviado\n", msgEnvia);
         printf("GET finalizado\n");
         return 0;
-    }else{
-        strcpy(msgEnvia, "ok");
-        write(cliente, msgEnvia, strlen(msgEnvia)+1);
     }
+
+    dataCon = iniciarConexaoDados(cliente, port, port2, ipCliente);
+
+    if(dataCon == 0){
+        printf("ERRO na conexao de dados, RECV finalizado\n");
+        return 0;
+    }
+
     printf("GET enviando arquivo \'%s\'\n", nomeArquivo);
     stat(nomeArquivo, &obj);
 
@@ -256,11 +262,14 @@ int opGet(int cliente){
 
     if(arquivo == 1)
         tamanho = 0;
-    write(cliente, &tamanho, sizeof(int));
+    //write(cliente, &tamanho, sizeof(int));
     if(tamanho)
         sendfile(cliente, arquivo, NULL, tamanho);
 
     printf("GET arquivo enviado\n");
+    strcpy(msgEnvia, "226 Arquivo enviado com sucesso\n");
+    write(cliente, msgEnvia, strlen(msgEnvia)+1);
+    close(dataCon);
     return 1;
 }
 
