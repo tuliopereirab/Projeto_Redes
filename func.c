@@ -12,6 +12,8 @@
 #define MAXBUF 100
 
 int iniciarConexaoDados(int cliente, int port, char ipCliente[]);
+int calcPort(int val1, int val2);
+int calcPortPASV(int val, int set);
 void finalizarSessao();
 void loopErro();
 
@@ -35,8 +37,8 @@ void opQuit(int cliente){
 
 int opPort(char portas[]){
     int i, j;
-    int porta, tam;
-    char aux[20];
+    int porta1, porta2, port, tam;
+    char aux1[20], aux2[20];
     i = 0, j=0;
     printf("AQUI CHEGOU!\n: %s", portas);
     tam = strlen(portas);
@@ -49,12 +51,44 @@ int opPort(char portas[]){
     j=0;
 
     while(portas[i] != ',')
-        aux[j++] = portas[i++];
+        aux1[j++] = portas[i++];
+    j=0;
+    i++;
+    while(portas[i] != '\0')
+        aux2[j++] = portas[i++];
 
-    printf("\naux: %s\n", aux);
-    porta = atoi(aux);
-    printf("Porta: %i\n", porta);
-    return porta;
+    tam = strlen(aux1);
+    for(i=0; i<tam; i++){
+        if((aux1[i] != '0') && (aux1[i] != '1') && (aux1[i] != '2') && (aux1[i] != '3') && (aux1[i] != '4') && (aux1[i] != '5') && (aux1[i] != '6') && (aux1[i] != '7') && (aux1[i] != '8') && (aux1[i] != '9')){
+            if(i == 0){
+                for(j=0; i<tam; i++){
+                    aux1[j] = aux1[j+1];
+                }
+            }else if(i > 1){
+                aux1[i] = '\0';
+            }
+        }
+    }
+
+    tam = strlen(aux2);
+    for(i=0; i<tam; i++){
+        if((aux2[i] != '0') && (aux2[i] != '1') && (aux2[i] != '2') && (aux2[i] != '3') && (aux2[i] != '4') && (aux2[i] != '5') && (aux2[i] != '6') && (aux2[i] != '7') && (aux2[i] != '8') && (aux2[i] != '9')){
+            if(i == 0){
+                for(j=0; i<tam; i++){
+                    aux2[j] = aux2[j+1];
+                }
+            }else if(i > 1){
+                aux2[i] = '\0';
+            }
+        }
+    }
+
+
+    printf("\naux1: %s\nAux2: %s\n", aux1, aux2);
+    porta1 = atoi(aux1);
+    porta2 = atoi(aux2);
+    port = calcPort(porta1, porta2);
+    return port;
 }
 
 int opLs(int cliente, int port, char ipCliente[]){
@@ -88,7 +122,7 @@ int opLs(int cliente, int port, char ipCliente[]){
 
 int opPasv(int cliente, int port, char ipCliente[]){
     char h1[4], h2[4], h3[4], h4[4], p1[7], p2[7];
-    int i, j=0, z=0;
+    int i, j=0, z=0, p1int, p2int;
     char msgEnviar[100];
     for(i=0; i<strlen(ipCliente); i++){
         if(ipCliente[i] == '.'){
@@ -112,9 +146,11 @@ int opPasv(int cliente, int port, char ipCliente[]){
             z++;
         }
     }
-    sprintf(p1, "%i", port+1);
-    sprintf(p2, "%i", port+2);
+    p1int = calcPortPASV(port, 0);
+    p2int = calcPortPASV(port+1, 1);
 
+    sprintf(p1, "%d", p1int);
+    sprintf(p2, "%d", p2int);
 
     if((strlen(h1)) > 3)
         for(i=3; i<strlen(h1); i++)

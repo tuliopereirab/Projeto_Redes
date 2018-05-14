@@ -4,19 +4,52 @@
 #include <string.h>
 
 void convertToHex(int decimalNumber, int set);
+void concatena();
+void inverter();
+void arruma();
+int convertToDec();
+int calcPort(int val1, int val2);
+int calcPortPASV(int val, int set);
+void separa();
+void inverterPasv();
+void arrumaPasv();
+int convertToDecPASV(int set);
+
 
 char v1[100], v2[100], conc[100];
-int i1, i2;
+int i1, i2, iConc;
 
-int main(){
-    int status;
-    status = calcPort(50, 80);
-    return 0;
+
+
+int calcPortPASV(int val, int set){
+    int i, port1, port2;
+    printf("PORTA: %i\n", val);
+    zerar();
+    convertToHex(val, 2);
+    //-------------------------------
+    printf("CONVERSAO: ");
+    for(i=0; i<100; i++)
+        printf("%c", conc[i]);
+    printf("\n");
+    //-------------------------------
+    arrumaPasv();
+    inverterPasv();
+    separa();
+    port1 = convertToDecPASV(0);
+    port2 = convertToDecPASV(1);
+    printf("PORTAs: %i e %i\n", port1, port2);
+    if(set == 0)
+        return port1;
+    else
+        return port2;
 }
+
 int calcPort(int val1, int val2){
     int port, i, j;
+    zerar();
     convertToHex(val1, 0);
     convertToHex(val2, 1);
+    //-----------------
     printf("\nEquivalent hexadecimal value of decimal number %d: ", val1);
     for(j = i1 ;j> 0;j--)
         printf("%c",v1[j]);
@@ -25,23 +58,20 @@ int calcPort(int val1, int val2){
     for(j = i1;j> 0;j--)
         printf("%c",v2[j]);
     printf("\n");
+    //----------------
     arruma();
     inverter();
     concatena();
-    printf("\nEquivalent hexadecimal value of decimal number %d: ", val1);
-    for(j = i1 ;j> 0;j--)
-        printf("%c",v1[j]);
-
-    printf("\nEquivalent hexadecimal value of decimal number %d: ",val2);
-    for(j = i1;j> 0;j--)
-        printf("%c",v2[j]);
-    printf("\n");
-    return 0;
+    port = convertToDec();
+    printf("PORTA: %i\n", port);
+    return port;
 }
 
 void convertToHex(int decimalNumber, int set){       // Referencia no link que está em 'Link_Envio'
     long int remainder,quotient;
     int i=1,j,temp;
+
+
 
     quotient = decimalNumber;
 
@@ -49,18 +79,21 @@ void convertToHex(int decimalNumber, int set){       // Referencia no link que e
         temp = quotient % 16;
 
       //To convert integer into character
-     if( temp < 10)
-        temp =temp + 48;
-    else
-        temp = temp + 55;
-    if(set == 0){
-        v1[i++]= temp;
-        i1 = i;
-    }else{
-        v2[i++] = temp;
-        i2 = i;
-    }
-    quotient = quotient / 16;
+        if( temp < 10)
+            temp =temp + 48;
+        else
+            temp = temp + 55;
+        if(set == 0){
+            v1[i++]= temp;
+            i1 = i;
+        }else if(set == 1){
+            v2[i++] = temp;
+            i2 = i;
+        }else if(set == 2){
+            conc[i++] = temp;
+            iConc = i;
+        }
+        quotient = quotient / 16;
     }
 
 //    printf("Equivalent hexadecimal value of decimal number %d: ",decimalNumber);
@@ -82,12 +115,35 @@ void concatena(){
     printf("Conc: %s\n", conc);
 }
 
+void separa(){
+    int i, j, tam, meio;
+    tam = strlen(conc);
+    meio = tam/2;
+    for(i=0; i<meio; i++){
+        v1[i] = conc[i];
+    }
+    j=0;
+    for(i=meio; i<tam; i++){
+        v2[j] = conc[i];
+        j++;
+    }
+
+    printf("Valores: \n\tv1: ");
+    for(i=0; i<meio; i++)
+        printf("%c", v1[i]);
+    printf("\n\tv2: ");
+    for(i=0; i<j; i++){
+        printf("%c", v2[i]);
+    }
+    printf("\n");
+}
+
 void inverter(){
     v1[i1] = '\0';
     v2[i2] = '\0';
     int i, j;
     char temp[100], temp2[100];
-    j = i1;
+    j = i1-1;
     for(i=0; i<i1; i++){
         temp[j] = v1[i];
         j--;
@@ -98,7 +154,7 @@ void inverter(){
     }
     v1[i] = '\0';
 
-    j = i2;
+    j = i2-1;
     for(i=0; i<i2; i++){
         temp2[j] = v2[i];
         j--;
@@ -109,6 +165,25 @@ void inverter(){
         printf("%c", v2[i]);
     }
     v2[i] = '\0';
+    printf("\n");
+
+}
+
+void inverterPasv(){
+    conc[iConc] = '\0';
+    int i, j;
+    char temp[100], temp2[100];
+    j = iConc-1;
+    for(i=0; i<iConc; i++){
+        temp[j] = conc[i];
+        j--;
+    }
+    for(i=0; i<iConc; i++){
+        conc[i] = temp[i];
+        printf("%c", conc[i]);
+    }
+    conc[i] = '\0';
+
     printf("\n");
 
 }
@@ -136,4 +211,38 @@ void arruma(){
     for(i=0; i<i2; i++)
         printf("%c", v2[i]);
     printf("\n");
+}
+
+void arrumaPasv(){
+    int i;
+    if((conc[0] != '0') && (conc[0] != '1') && (conc[0] != '2') && (conc[0] != '3') && (conc[0] != '4') && (conc[0] != '5') && (conc[0] != '6') && (conc[0] != '7') && (conc[0] != '8') && (conc[0] != '9') && (conc[0] != 'A') && (conc[0] != 'B') && (conc[0] != 'C') && (conc[0] != 'D') && (conc[0] != 'E') && (conc[0] != 'F')){
+        for(i=0; i<iConc; i++){
+            conc[i] = conc[i+1];
+        }
+        iConc--;
+    }
+
+}
+
+int convertToDec(){
+    long int port = strtol(conc, NULL, 16);
+    return port;
+}
+
+int convertToDecPASV(int set){
+    long int port;
+    if(set == 0)
+        port = strtol(v1, NULL, 16);
+    else
+        port = strtol(v2, NULL, 16);
+    return port;
+}
+
+void zerar(){
+    int i;
+    for(i=0; i<100; i++){
+        v1[i] = NULL;
+        v2[i] = NULL;
+        conc[i] = NULL;
+    }
 }
