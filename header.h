@@ -4,12 +4,19 @@
 #include "login.c"
 #include "connection.c"
 #include "porta.c"
+#include "apoio.c"
 
+// LOGIN.C
 int carregarClientes();
 void finalizarSessao();
 int logar(char nome[], char senha[]);
-int opLs(int cliente, int port, char ipCliente[]);
+//--------------------------
+// SERVER.C
 int opUser(int cliente);
+void loopErro();
+//--------------------------
+// FUNC.C
+int opLs(int cliente, int port, char ipCliente[]);
 void opQuit(int cliente);
 int opCwd(int cliente, char pasta[]);
 int opCwdPonto(int cliente);
@@ -19,8 +26,14 @@ int opPwd(int cliente);
 int opRmd(int cliente, char pasta[]);
 int opMkd(int cliente, char pasta[]);
 int opDele(int cliente, char arquivo[]);
-int iniciarConexaoDados(int cliente, int port, char ipCliente[]);
 int opPort(char portas[]);
+//--------------------------
+// CONNECTION.C
+int iniciarConexaoDados(int cliente, int port, char ipCliente[]);
+//--------------------------
+// PORTA.C
 int calcPort(int val1, int val2);
 int calcPortPASV(int val, int set);
-void loopErro();
+//--------------------------
+// APOIO.c
+char* readFileBytes(const char *name);

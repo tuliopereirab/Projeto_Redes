@@ -16,6 +16,7 @@ int calcPort(int val1, int val2);
 int calcPortPASV(int val, int set);
 void finalizarSessao();
 void loopErro();
+char* readFileBytes(const char *name);
 
 
 void opQuit(int cliente){
@@ -96,9 +97,10 @@ int opLs(int cliente, int port, char ipCliente[]){
 
     struct stat obj;
     int dataCon;
-    int tamanho;
-    int arquivo;
+    int tamanho, i;
+    //int arquivo;
     char msgEnvia[100];
+    char *arquivo;
     FILE *arq;
 
     dataCon = iniciarConexaoDados(cliente, port, ipCliente);
@@ -109,13 +111,17 @@ int opLs(int cliente, int port, char ipCliente[]){
         system("iconv temp.txt --to-code ASCII >temp2.txt");
         stat("temp2.txt", &obj);
         tamanho = obj.st_size;
-        write(cliente, &tamanho, sizeof(int));
-        arquivo = open("temp2.txt", O_RDONLY);
-        sendfile(dataCon, arquivo, NULL, tamanho);
+        //write(cliente, &tamanho, sizeof(int));
+        //arquivo = open("temp2.txt", O_RDONLY);
+        arquivo = readFileBytes("temp2.txt");
+        for(i=0; i<tamanho; i++){
+            write(dataCon, arquivo[i], 1);
+        }
+        //sendfile(dataCon, arquivo, NULL, tamanho);
         //write(dataCon, arquivo, tamanho);
+        close(dataCon);
         strcpy(msgEnvia, "250 Arquivo enviado\n");
         write(cliente, msgEnvia, strlen(msgEnvia)+1);
-        close(dataCon);
         printf("LIST enviado\n");
         system("rm temp.txt");
         system("rm temp2.txt");
@@ -240,8 +246,9 @@ int opCwdPonto(int cliente){
 int opPut(int cliente, char nomeArquivo[], char ipCliente[], int port){
     printf("PUT aguardando arquivo\n");
     int dataCon;
-    int tamanho, fileh;
-    char *arquivo;
+    int tamanho, fileh, i;
+    ssize_t tamT;
+    char *arquivo, *arqTemp;
     char msgEnvia[100];
     dataCon = iniciarConexaoDados(cliente, port, ipCliente);
 
@@ -251,10 +258,17 @@ int opPut(int cliente, char nomeArquivo[], char ipCliente[], int port){
     }
 
     printf("PUT recebendo arquivo \'%s\'\n", nomeArquivo);
-    read(cliente, &tamanho, sizeof(int));
+    //read(cliente, &tamanho, sizeof(int));
 
-    arquivo = malloc(tamanho);
-    read(cliente, arquivo, tamanho);
+    arquivo = malloc(sizeof(char)*1);
+    i = 1;
+    while((tamT = recv(dataCon, arqTemp, 1, MSG_WAITALL)) > 0){
+        realloc(arquivo, sizeof(char)*i);
+        arquivo[i-1] = arqTemp;
+        tamanho = tamanho + tamT;
+        i++;
+    }
+    //read(cliente, arquivo, tamanho);
 
     fileh = open(nomeArquivo, O_CREAT | O_EXCL | O_WRONLY, 0666);
     write(fileh, arquivo, tamanho, 0);
@@ -269,8 +283,10 @@ int opGet(int cliente, char ipCliente[], int port, char nomeArquivo[]){
     printf("GET solicitado\n");
     char msgEnvia[100];
     struct stat obj;
-    int arquivo, tamanho;
+    int tamanho, i;
     int dataCon;
+    int arquivo;
+    //char *arquivo;
 
     if(fopen(nomeArquivo, "r+") == NULL){
         strcpy(msgEnvia, "550 Arquivo inexistente\n");
@@ -291,14 +307,15 @@ int opGet(int cliente, char ipCliente[], int port, char nomeArquivo[]){
     stat(nomeArquivo, &obj);
 
     arquivo = open(nomeArquivo, O_RDONLY);
+    //arquivo = readFileBytes(nomeArquivo);
     tamanho = obj.st_size;
 
     if(arquivo == 1)
         tamanho = 0;
-    //write(cliente, &tamanho, sizeof(int));
-    if(tamanho)
-        sendfile(cliente, arquivo, NULL, tamanho);
-
+    //write(dataCon, &tamanho, sizeof(int));
+    if(tamanho){
+        sendfile(dataCon, arquivo, NULL, tamanho);
+    }
     printf("GET arquivo enviado\n");
     strcpy(msgEnvia, "226 Arquivo enviado com sucesso\n");
     write(cliente, msgEnvia, strlen(msgEnvia)+1);

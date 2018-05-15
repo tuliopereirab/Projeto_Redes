@@ -165,6 +165,8 @@ void conversa(int cliente){
                     op = 50;
                 else if((strcmp(comando, "PASV")) == 0)
                     op = 51;
+                else if((strcmp(comando, "NOOP")) == 0)
+                    op = 98;
                 else if((strcmp(comando, "QUIT")) == 0)
                     op = 99;
                 else
@@ -233,6 +235,10 @@ void conversa(int cliente){
                 break;
             case 70:
                 strcpy(msgEnvia, "530 usuario nao logado\n");
+                write(cliente, msgEnvia, strlen(msgEnvia)+1);
+                break;
+            case 98:
+                strcpy(msgEnvia, "200 OK\n");
                 write(cliente, msgEnvia, strlen(msgEnvia)+1);
                 break;
             case 99:
@@ -352,6 +358,7 @@ int opUser(int cliente){
 
 void encontrarComando(char msg[]){
     int i;
+    char *com;
     for(i=0; i<4; i++){
         comando[i] = NULL;
         if(msg[i] != ' ')
@@ -378,7 +385,6 @@ void encontrarParametro(char msg[]){
         j++;
     }
     parametro[j] = '\0';
-
 
     printf("Parametro: %s\n", parametro);
 }

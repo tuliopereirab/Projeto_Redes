@@ -60,4 +60,33 @@
             * O único arquivo testado foi o 'teste1.txt'.
         - MODE não será IMPLEMENTADO
             * Motivo: o cliente FTP padrão do Linux, e possivelmente do Windows também, aceita apenas o modo de transmissão Stream Mode. Logo, um comando que faz o servidor enviar em outros modos é desnecessário neste cenário específico.
-        
+
+6.33    - PORT
+            * Problema: o último parametro (p2) é recebido e, quando tiver apenas 2 caracteres, um novo caractere é adicionado ao final, fazendo com que a porta fique absurdamente grande e impossibilitando o inicio da conexão de dados
+        - RECV 80% funcional
+            * Arquivos .pptx, .rar, .zip chegam corrompidos ao destino e não podem ser recuperados.
+            * Arquivos .jpeg chegam com a foto pela metade ou deformada.
+            * Arquivos .doc chegam com caracteres estranhos no seu conteúdo.
+            * Arquivos .pdf, .txt chegam perfeitamente inteiros e funcionais.
+            * Pastas não são reconhecidas como arquivos (CORRETO).
+        - TYPE não será implementada
+            * O comando Type define o tipo de arquivo que será recebido. Porém, o cliente padrão do Linux já define que o tipo será ASCII Non-print. Para um sistema simples e funcional, não é necessário, então, o comando type.
+        - STRU não será implementadas
+            * O comando STRU define a estrutura de arquivo. No caso de um sistema simples que rodará no cliente padrão do Linux, o padrão está definido como FILE.
+        - STOR
+            * Não funcional e, todas as vezes que foi testado, fez o sistema crashar. Logo NÃO UTILIZAR!
+            * Funcionamento
+                ~ O cliente começará a enviar Bytes do arquivo a ser enviado.
+                ~ Como o tamanho do arquivo não foi enviado antes, o recebimento deve rodar até o cliente finalizar a conexão de dados.
+                ~ Quando o cliente finalizar a conexão de dados, o arquivo recebido deve ser montado e salvo com o nome definido na pasta atual do servidor.
+            * problemas
+                ~ não conheço uma maneira de detectar perda de conexão.
+                ~ Falta de conhecimento sobre o sistema de envio de arquivos do protocolo (implementado pelo cliente).
+                ~ Servidor precisa receber Bytes até que seja finalizada a conexão, como alocar tudo?
+        - LIST
+            * O arquivo é enviado sem problemas, porém ele não é aberto no destino automaticamente.
+            * Ideia:
+                ~ como o arquivo não é aberto e não aparece como deveria, uma ideia seria mandar o conteúdo do arquivo na conexão de controle, pois ela será impressa na tela.
+        - NOOP funcional
+            * Implementado comando NOOP, que simplesmente responde um "200 OK" ao cliente. Ele é usado para manter a conexão de controle ativa após grandes períodos de silêncio.
+            * O cliente envia um NOOP simplesmente para enviar algo e o servidor responder, para um saber que o outro ainda está lá esperando e nenhum deles reconhecer que a conexão do outro foi finalizada ou algo do tipo. 
