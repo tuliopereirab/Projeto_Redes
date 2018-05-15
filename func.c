@@ -6,8 +6,12 @@
 #include <sys/stat.h>
 #include <sys/sendfile.h>
 
+#include <sys/ioctl.h>
 #include <fcntl.h>
 
+struct vetChar{
+    char byte[8];
+};
 
 #define MAXBUF 100
 
@@ -248,8 +252,11 @@ int opPut(int cliente, char nomeArquivo[], char ipCliente[], int port){
     int dataCon;
     int tamanho, fileh, i;
     ssize_t tamT;
-    char *arquivo, *arqTemp;
+    char *arquivo;
+    //int arquivo;
     char msgEnvia[100];
+    char temp[100];
+    struct vetChar *vet;
     dataCon = iniciarConexaoDados(cliente, port, ipCliente);
 
     if(dataCon == 0){
@@ -259,16 +266,37 @@ int opPut(int cliente, char nomeArquivo[], char ipCliente[], int port){
 
     printf("PUT recebendo arquivo \'%s\'\n", nomeArquivo);
     //read(cliente, &tamanho, sizeof(int));
-
-    arquivo = malloc(sizeof(char)*1);
-    i = 1;
-    while((tamT = recv(dataCon, arqTemp, 1, MSG_WAITALL)) > 0){
-        realloc(arquivo, sizeof(char)*i);
-        arquivo[i-1] = arqTemp;
-        tamanho = tamanho + tamT;
+    //arquivo = malloc(sizeof(char)*8);
+    vet = malloc(sizeof(struct vetChar));
+    int n;
+    i=1;
+    while(1){
+        n = read(dataCon, vet[i-1].byte, 8);
+        printf("Leu: %s\n", vet[i-1].byte);
+        if(n <= 0 || n == -1)
+            break;
         i++;
+        vet = realloc(vet, sizeof(struct vetChar)*i);
     }
+
+    /*read(dataCon, temp, sizeof(char)*8);
+    printf("Recebeu: %s\n", temp);
+    i=1;
+    while((strcmp(temp, "00000010")) != 0){
+        printf("Mandou %i\n", i);
+        strcpy(arquivo[i-1], temp);
+        i++;
+        arquivo = realloc(NULL, sizeof(char)*8*i);
+        read(dataCon, temp, 100);
+    }
+
+*/
+
     //read(cliente, arquivo, tamanho);
+    /*tamanho = 0;
+    ioctl(dataCon, FIONREAD, &tamanho);
+    read(dataCon, arquivo, tamanho);
+    */
 
     fileh = open(nomeArquivo, O_CREAT | O_EXCL | O_WRONLY, 0666);
     write(fileh, arquivo, tamanho, 0);

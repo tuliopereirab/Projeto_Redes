@@ -89,4 +89,9 @@
                 ~ como o arquivo não é aberto e não aparece como deveria, uma ideia seria mandar o conteúdo do arquivo na conexão de controle, pois ela será impressa na tela.
         - NOOP funcional
             * Implementado comando NOOP, que simplesmente responde um "200 OK" ao cliente. Ele é usado para manter a conexão de controle ativa após grandes períodos de silêncio.
-            * O cliente envia um NOOP simplesmente para enviar algo e o servidor responder, para um saber que o outro ainda está lá esperando e nenhum deles reconhecer que a conexão do outro foi finalizada ou algo do tipo. 
+            * O cliente envia um NOOP simplesmente para enviar algo e o servidor responder, para um saber que o outro ainda está lá esperando e nenhum deles reconhecer que a conexão do outro foi finalizada ou algo do tipo.
+
+6.331
+        - PUT ainda não funcional
+            * não é possível receber um arquivo sem ter o tamanho dele informado.
+            * Não é possível verificar perda de conexão no socket.
