@@ -13,7 +13,7 @@ int opUser(int cliente);
 void opQuit(int cliente);
 int opCwd(int cliente, char pasta[]);
 int opCwdPonto(int cliente);
-int opPut(int cliente);
+int opPut(int cliente, char nomeArquivo[], char ipCliente[], int port);
 int opGet(int cliente, char ipCliente[], int port, char nomeArquivo[]);
 int opPwd(int cliente);
 int opRmd(int cliente, char pasta[]);

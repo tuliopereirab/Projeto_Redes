@@ -106,16 +106,19 @@ int opLs(int cliente, int port, char ipCliente[]){
         return 0;
     }else{
         system("ls >temp.txt");
-        stat("temp.txt", &obj);
+        system("iconv temp.txt --to-code ASCII >temp2.txt");
+        stat("temp2.txt", &obj);
         tamanho = obj.st_size;
         write(cliente, &tamanho, sizeof(int));
-        arquivo = open("temp.txt", O_RDONLY);
+        arquivo = open("temp2.txt", O_RDONLY);
         sendfile(dataCon, arquivo, NULL, tamanho);
+        //write(dataCon, arquivo, tamanho);
         strcpy(msgEnvia, "250 Arquivo enviado\n");
         write(cliente, msgEnvia, strlen(msgEnvia)+1);
         close(dataCon);
         printf("LIST enviado\n");
         system("rm temp.txt");
+        system("rm temp2.txt");
         return 1;
     }
 }
@@ -147,7 +150,7 @@ int opPasv(int cliente, int port, char ipCliente[]){
         }
     }
     p1int = calcPortPASV(port, 0);
-    p2int = calcPortPASV(port+1, 1);
+    p2int = calcPortPASV(port, 1);
 
     sprintf(p1, "%d", p1int);
     sprintf(p2, "%d", p2int);
@@ -234,33 +237,32 @@ int opCwdPonto(int cliente){
     }
 }
 
-int opPut(int cliente){
+int opPut(int cliente, char nomeArquivo[], char ipCliente[], int port){
     printf("PUT aguardando arquivo\n");
-    char msgRecebe[100];
+    int dataCon;
     int tamanho, fileh;
     char *arquivo;
-    char nomeArquivo[25];
-    read(cliente, msgRecebe, MAXBUF);
-    if((strcmp(msgRecebe, "ok")) == 0){
-        printf("PUT cliente ok\n");
-        read(cliente, nomeArquivo, 25);
-        printf("PUT recebendo arquivo \'%s\'\n", nomeArquivo);
-        read(cliente, &tamanho, sizeof(int));
+    char msgEnvia[100];
+    dataCon = iniciarConexaoDados(cliente, port, ipCliente);
 
-        arquivo = malloc(tamanho);
-        read(cliente, arquivo, tamanho);
-
-        fileh = open(nomeArquivo, O_CREAT | O_EXCL | O_WRONLY, 0666);
-        write(fileh, arquivo, tamanho, 0);
-        close(fileh);
-
-        printf("PUT arquivo recebido\n");
-        return 1;
-    }else{
-        printf("PUT erro do cliente\n");
-        printf("PUT finalizado\n");
+    if(dataCon == 0){
+        printf("ERRO ao abrir conexao de dados, PUT finalizado\n");
         return 0;
     }
+
+    printf("PUT recebendo arquivo \'%s\'\n", nomeArquivo);
+    read(cliente, &tamanho, sizeof(int));
+
+    arquivo = malloc(tamanho);
+    read(cliente, arquivo, tamanho);
+
+    fileh = open(nomeArquivo, O_CREAT | O_EXCL | O_WRONLY, 0666);
+    write(fileh, arquivo, tamanho, 0);
+    close(fileh);
+    strcpy(msgEnvia, "250 arquivo recebido\n");
+    write(cliente, msgEnvia, strlen(msgEnvia)+1);
+    printf("PUT arquivo recebido\n");
+    return 1;
 }
 
 int opGet(int cliente, char ipCliente[], int port, char nomeArquivo[]){
@@ -281,7 +283,7 @@ int opGet(int cliente, char ipCliente[], int port, char nomeArquivo[]){
     dataCon = iniciarConexaoDados(cliente, port, ipCliente);
 
     if(dataCon == 0){
-        printf("ERRO na conexao de dados, RECV finalizado\n");
+        printf("ERRO na conexao de dados, GET finalizado\n");
         return 0;
     }
 

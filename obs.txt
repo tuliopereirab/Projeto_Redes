@@ -1,0 +1,63 @@
+6.2 - RECV (get) implementado mas não testado
+        * RECV: comentada parte que envia o tamanho do arquivo para o cliente, já que o cliente deve ter algo que permita que ele receba só o arquivo. Logo, só ficou a parte de sendfile.
+    - conexão de dados não é iniciada mesmo com root (já que o PASV não é lido para solicitar outra porta)
+    - Nenhum problema encontrado na função PORT
+    - PASV e conexãosDeDados não funcionais:
+        * PASV: servidor retorna um novo endereço de IP e porta no formato (h1,h2,h3,h4,p1,p2) e o cliente não consegue interpretar ele de forma adequada para setar a porta correta
+
+        * conexãoDeDados: não consegue iniciar uma conexão de dados porque, provavelmente, o sistema não permite. Já que o PASV não está funcional, não é possível selecionar uma porta alta para conexão
+
+    (RESOLVIDO) - Quando a senha é incorreta, o servidor fica sem o que fazer e finaliza.
+
+    - Adicionada e testada (com ERRO) aquisição de DUAS PORTAS no comando PORT, já que o cliente encaminha duas portas ao servidor. Agora existem: port e port2
+        * port2: quando a segunda porta é um valor de 2 caracteres, é adicionado um caractere 'aleatório' ao final dela. (PROBLEMA)
+
+    - Conexão de dados agora testa as duas portas enviadas pelo cliente, caso mesmo assim não consiga conexão, é enviado que ocorreu um erro ao estabelecer conexão de dados. Se conseguir em uma porta, é enviado código de ok e de inicio do envio do arquivo
+
+    - Adicionado sistema de verificar se usuário está online (para evitar login duplo simultâneo quando com thread e evitar que a mesma pasta seja controlada por duas threads).
+    - Quando um usuário deslogar, finalizarSessao() será usado para voltar o status do usuário para zero.
+
+
+*** FALTA
+    - STOR
+    - TYPE
+    - MODE
+    - STRU
+
+
+6.21 - Função de pegar duas portas (port2) retirada completamente do código
+    - Arquivo porta.c criado para escolher a porta, porém ainda não funcional! Arquivo independente, testar sem os outros ainda.
+
+6.211 - Arquivo porta.c continua com problemas. Todos os printf de teste foram colocados.
+      - Problema na inversão do valor.
+
+
+6.3     - comando PORT funcionando, portas setadas corretamente;
+        - comando GET, LIST funcionando parcialmente
+            * GET: arquivo que foi enviado não foi encontrado no destino, mas o conteudo é impresso na tela do clientes
+            * LIST: precisa converter o arquivo .txt para ASCII: https://www.vivaolinux.com.br/dica/iconv-Convertendo-a-codificacao-de-arquivos-no-GNULinux
+        - Função PASV implementada e testada.
+
+6.31 * LIST: o arquivo que é enviado é um arquivo .txt, mas o cliente espera receber um arquivo codificado em ASCII. Precisa fazer uma conversão para ASCII e enviar ao cliente o arquivo codificado adequadamente. Link para codificação: https://www.vivaolinux.com.br/dica/iconv-Convertendo-a-codificacao-de-arquivos-no-GNULinux
+
+    * PWD: comando não é reconhecido. Só é reconhecido quando digitado no Telnet e com espaço no final ("PWD "). Todos os outros comandos são reconhecidos, exceto ele. Deve-se revisar toda a arquivo de funções que chamam o comando e procurar algum erro. Todos os comandos de 3 caracteres estão funcionando corretamente e sendo reconhecidos (MKD, RMD).
+
+    * RETR: arquivo que foi enviado não pode ser encontrado no local de destino. Talvez não seja um problema, mas sim uma falta de entendimento do que o cliente implementa. Existe um arquivo, que foi encontrado, nomeado com o que foi digitado no segundo campo do 'get', porém estava vazio. O conteúdo do arquivo enviado aparece no prompt de comando indicando que o arquivo de fato foi recebido.
+
+    * PASS: comando que é chamado dentro da função 'opUser' para efetivar o login do cliente. Algumas vezes é possível perceber que a senha foi digitada incorretamente, porém, o que acontece é que uma das funções filhas do PASS adiciona um caractere a mais na string que contém a senha, fazendo com que ela não seja reconhecida no teste. É preciso revisar a sequencia de funções chamadas pelo PASS e encontrar a função com problema.
+
+    Demais funções, com exceção do STOR, estão funcionando. A RFC prevê que algumas funções adicionais sejam implementadas, possivelmente para evitar erros futuros, porém ainda não foram implementadas. Elas estão destacadas com caneta vermelha na olha da RFC impressa.
+
+6.32    - PASV Não FUNCIONAL
+            * Foi encontrado um erro no comando PASV no qual o valor passado não pode ser lido. Mensagem de erro: "Passive mode address scan failure.Shouldn't happen!" no cliente. Esse erro vem, possivelmente, de um erro de tradução. Revisar arquivo 'porta.c' nas funções do PASV.
+        - STOR não FUNCIONAL
+            * Comando STOR parcialmente modificado. Implementada funcionalidade, porém não foi possível receber um arquivo, já que não se tem o tamanho dele. É preciso revisar o envio de arquivos pelo Stream Mode em C. Uma possível solução é receber bytes enquanto forem enviados.
+        - LIST não funcional
+            * Comando LIST foi modificado para converter o arquivo para ASCII e, após, enviar. Porém, no cliente é reportado que o envio do arquivo está incorreto. O envio é por Stream Mode, já que o cliente só aceita ele, porém não foi possível enviar corretamente. É preciso revisar a parte de Stream em C.
+        - RECV não funcional
+            * comando RECV parcialmente funcional, já que o arquivo é enviado, chega ao destino, é lido pelo cliente (e impresso na tela), porém é salvo vazio na pasta de destino (pasta atual onde o comando 'ftp' foi chamado).
+            * O motivo deve ser a questão do envio por Stream Mode, que está causando problemas.
+            * O único arquivo testado foi o 'teste1.txt'.
+        - MODE não será IMPLEMENTADO
+            * Motivo: o cliente FTP padrão do Linux, e possivelmente do Windows também, aceita apenas o modo de transmissão Stream Mode. Logo, um comando que faz o servidor enviar em outros modos é desnecessário neste cenário específico.
+        

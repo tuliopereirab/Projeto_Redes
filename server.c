@@ -27,7 +27,7 @@ int opLs(int cliente, int port, char ipCliente[]);
 void opQuit(int cliente);
 int opCwd(int cliente, char pasta[]);
 int opCwdPonto(int cliente);
-int opPut(int cliente);
+int opPut(int cliente, char nomeArquivo[], char ipCliente[], int port);
 int opGet(int cliente, char ipCliente[], int port, char nomeArquivo[]);
 int opPwd(int cliente);
 int opRmd(int cliente, char pasta[]);
@@ -197,7 +197,7 @@ void conversa(int cliente){
                 status = opPwd(cliente);
                 break;
             case 10:
-                status = opPut(cliente);
+                status = opPut(cliente, parametro, ipCliente, port);
                 break;
             case 11:
                 status = opGet(cliente, ipCliente, port, parametro);
@@ -229,7 +229,7 @@ void conversa(int cliente){
                 write(cliente, msgEnvia, strlen(msgEnvia)+1);
                 break;
             case 51:
-                status = opPasv(cliente, PORTA, ipCliente);
+                status = opPasv(cliente, port, ipCliente);
                 break;
             case 70:
                 strcpy(msgEnvia, "530 usuario nao logado\n");
