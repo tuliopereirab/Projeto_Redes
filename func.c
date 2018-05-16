@@ -133,10 +133,11 @@ int opLs(int cliente, int port, char ipCliente[]){
     }
 }
 
-int opPasv(int cliente, int port, char ipCliente[]){
+int opPasv(int cliente, int porta, char ipCliente[]){
     char h1[4], h2[4], h3[4], h4[4], p1[7], p2[7];
     int i, j=0, z=0, p1int, p2int;
     char msgEnviar[100];
+    int port = porta+1;
     for(i=0; i<strlen(ipCliente); i++){
         if(ipCliente[i] == '.'){
             j++;

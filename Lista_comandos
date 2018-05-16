@@ -8,10 +8,10 @@ Comandos FTP:
 3 - ls -la - igual ao dir mas lista tbm arquivos ocultos (NÃO SERÁ IMPLEMENTADO)
 4 - CWD [nome do diretorio] - acessar um diretorio  (FUNCIONAL)
 5 - CDUP - retornar para o diretório acima (FUNCIONAL)
-6 - PWD - envia o caminho do diretorio atual (NÃO FUNCIONAL - olhar comentário de upload 6.31)
+6 - PWD - envia o caminho do diretorio atual (FUNCIONAL)
 
 10 - STOR [local do arquivo]  - upload pro servidor (NÃO FUNCIONAL - olhar comentário de upload 6.33)
-11 - RETR [nome do arquivo]  - download do servidor (NÃO FUNCIONAL - olhar comentário de upload 6.33)
+11 - RETR [nome do arquivo]  - download do servidor (80% FUNCIONAL - olhar comentário de upload 6.33)
 
 
 20 - RMD - rmdir (FUNCIONAL)

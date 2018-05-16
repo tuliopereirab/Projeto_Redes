@@ -95,3 +95,9 @@
         - PUT ainda não funcional
             * não é possível receber um arquivo sem ter o tamanho dele informado.
             * Não é possível verificar perda de conexão no socket.
+
+6.335
+        - PWD funcional
+            * problema de não reconhecimento corrigido fazendo uma atribuição NULL na última posição da string 'comando', já que PWD só tem 3 caracteres e comando espera receber 4. Então, o sistema verifica se a primeira letra é 'P', se a segunda é 'W' e se a terceira é 'D', caso afirmativo para todas, a posição 'comando[3] = NULL'.
+        - PASV não funcional
+            * Foi colocado, no inicio da função 'opPasv', o retorno da porta padrão de dados usada pelo servidor, que é PORTA+1.

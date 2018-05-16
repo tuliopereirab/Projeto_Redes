@@ -231,7 +231,7 @@ void conversa(int cliente){
                 write(cliente, msgEnvia, strlen(msgEnvia)+1);
                 break;
             case 51:
-                status = opPasv(cliente, port, ipCliente);
+                status = opPasv(cliente, PORTA, ipCliente);
                 break;
             case 70:
                 strcpy(msgEnvia, "530 usuario nao logado\n");
@@ -367,6 +367,10 @@ void encontrarComando(char msg[]){
             comando[i] = '\0';
     }
     comando[4] = '\0';
+    if(comando[0] == 'P')
+        if(comando[1] == 'W')
+            if(comando[2] == 'D')
+                comando[3] = NULL;
     printf("Comando: %s\n", comando);
 }
 
