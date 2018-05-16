@@ -26,12 +26,6 @@ int calcPortPASV(int val, int set){
     printf("PORTA: %i\n", val);
     zerar();
     convertToHex(val, 2);
-    //-------------------------------
-    printf("CONVERSAO: ");
-    for(i=0; i<100; i++)
-        printf("%c", conc[i]);
-    printf("\n");
-    //-------------------------------
     arrumaPasv();
     inverterPasv();
     separa();
@@ -49,16 +43,6 @@ int calcPort(int val1, int val2){
     zerar();
     convertToHex(val1, 0);
     convertToHex(val2, 1);
-    //-----------------
-    printf("\nEquivalent hexadecimal value of decimal number %d: ", val1);
-    for(j = i1 ;j> 0;j--)
-        printf("%c",v1[j]);
-
-    printf("\nEquivalent hexadecimal value of decimal number %d: ",val2);
-    for(j = i1;j> 0;j--)
-        printf("%c",v2[j]);
-    printf("\n");
-    //----------------
     arruma();
     inverter();
     concatena();
@@ -95,11 +79,6 @@ void convertToHex(int decimalNumber, int set){       // Referencia no link que e
         }
         quotient = quotient / 16;
     }
-
-//    printf("Equivalent hexadecimal value of decimal number %d: ",decimalNumber);
-//    for(j = i -1 ;j> 0;j--)
-      //printf("%c",v2[j]);
-
 }
 
 void concatena(){
@@ -112,7 +91,7 @@ void concatena(){
         conc[j] = v2[i];
         j++;
     }
-    printf("Conc: %s\n", conc);
+    //printf("Conc: %s\n", conc);
 }
 
 void separa(){
@@ -128,14 +107,6 @@ void separa(){
         j++;
     }
 
-    printf("Valores: \n\tv1: ");
-    for(i=0; i<meio; i++)
-        printf("%c", v1[i]);
-    printf("\n\tv2: ");
-    for(i=0; i<j; i++){
-        printf("%c", v2[i]);
-    }
-    printf("\n");
 }
 
 void inverter(){
@@ -150,7 +121,6 @@ void inverter(){
     }
     for(i=0; i<i1; i++){
         v1[i] = temp[i];
-        printf("%c", v1[i]);
     }
     v1[i] = '\0';
 
@@ -162,10 +132,8 @@ void inverter(){
     printf("\n");
     for(i=0; i<i2; i++){
         v2[i] = temp2[i];
-        printf("%c", v2[i]);
     }
     v2[i] = '\0';
-    printf("\n");
 
 }
 
@@ -180,11 +148,9 @@ void inverterPasv(){
     }
     for(i=0; i<iConc; i++){
         conc[i] = temp[i];
-        printf("%c", conc[i]);
     }
     conc[i] = '\0';
 
-    printf("\n");
 
 }
 
@@ -202,15 +168,6 @@ void arruma(){
             v2[i] = v2[i+1];
         i2--;
     }
-
-
-    printf("ARRUMA!\n");
-    for(i=0; i<i1; i++)
-        printf("%c", v1[i]);
-    printf("\n");
-    for(i=0; i<i2; i++)
-        printf("%c", v2[i]);
-    printf("\n");
 }
 
 void arrumaPasv(){

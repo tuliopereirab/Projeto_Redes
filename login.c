@@ -15,7 +15,6 @@ struct clientes{
 
 struct clientes *listaClientes;
 int nClientes;
-int idCliente; // posição do vetor do cliente que conseguiu login; Para ser usado para finalizar a conexão
 
 int carregarClientes(){
     FILE *arq;
@@ -45,8 +44,7 @@ int logar(char nome[], char senha[]){
         if((strcmp(listaClientes[i].nome, nome)) == 0){
             if((strcmp(listaClientes[i].senha, senha)) == 0){
                 if(listaClientes[i].status == 0){
-                    listaClientes[nClientes-1].status = 1;
-                    idCliente = i;
+                    listaClientes[i].status = 1;
                     return 1; // 1 = cliente logado com sucesso
                 }else
                     return 10;  // 10 = cliente já logado
@@ -60,6 +58,15 @@ int logar(char nome[], char senha[]){
     printf("LOGIN cliente não encontrado\n");
     status = cadastrar(nome, senha);
     return status;
+}
+
+int pegarIdCliente(char nome[]){
+    int i, id;
+    for(i=0; i<nClientes; i++)
+        if((strcmp(listaClientes[i].nome, nome)) == 0){
+            id = i;
+            return id;
+        }
 }
 
 int cadastrar(char nome[], char senha[]){
@@ -97,7 +104,7 @@ int cadastrar(char nome[], char senha[]){
     return 2; // 2 - cliente cadastrado com sucesso
 }
 
-void finalizarSessao(){
+void finalizarSessao(int idCliente){
     listaClientes[idCliente].status = 0;
     printf("Cliente \'%s\' agora está offline\n", listaClientes[idCliente].nome);
     return 1;

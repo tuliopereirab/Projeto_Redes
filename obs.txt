@@ -1,4 +1,5 @@
-6.2 - RECV (get) implementado mas não testado
+6.2
+    - RECV (get) implementado mas não testado
         * RECV: comentada parte que envia o tamanho do arquivo para o cliente, já que o cliente deve ter algo que permita que ele receba só o arquivo. Logo, só ficou a parte de sendfile.
     - conexão de dados não é iniciada mesmo com root (já que o PASV não é lido para solicitar outra porta)
     - Nenhum problema encontrado na função PORT
@@ -18,27 +19,29 @@
     - Quando um usuário deslogar, finalizarSessao() será usado para voltar o status do usuário para zero.
 
 
-*** FALTA
-    - STOR
-    - TYPE
-    - MODE
-    - STRU
+    *** FALTA
+        - STOR
+        - TYPE
+        - MODE
+        - STRU
 
-
-6.21 - Função de pegar duas portas (port2) retirada completamente do código
+6.21
+    - Função de pegar duas portas (port2) retirada completamente do código
     - Arquivo porta.c criado para escolher a porta, porém ainda não funcional! Arquivo independente, testar sem os outros ainda.
 
-6.211 - Arquivo porta.c continua com problemas. Todos os printf de teste foram colocados.
+6.211
+    - Arquivo porta.c continua com problemas. Todos os printf de teste foram colocados.
       - Problema na inversão do valor.
 
-
-6.3     - comando PORT funcionando, portas setadas corretamente;
+6.3
+        - comando PORT funcionando, portas setadas corretamente;
         - comando GET, LIST funcionando parcialmente
             * GET: arquivo que foi enviado não foi encontrado no destino, mas o conteudo é impresso na tela do clientes
             * LIST: precisa converter o arquivo .txt para ASCII: https://www.vivaolinux.com.br/dica/iconv-Convertendo-a-codificacao-de-arquivos-no-GNULinux
         - Função PASV implementada e testada.
 
-6.31 * LIST: o arquivo que é enviado é um arquivo .txt, mas o cliente espera receber um arquivo codificado em ASCII. Precisa fazer uma conversão para ASCII e enviar ao cliente o arquivo codificado adequadamente. Link para codificação: https://www.vivaolinux.com.br/dica/iconv-Convertendo-a-codificacao-de-arquivos-no-GNULinux
+6.31
+    * LIST: o arquivo que é enviado é um arquivo .txt, mas o cliente espera receber um arquivo codificado em ASCII. Precisa fazer uma conversão para ASCII e enviar ao cliente o arquivo codificado adequadamente. Link para codificação: https://www.vivaolinux.com.br/dica/iconv-Convertendo-a-codificacao-de-arquivos-no-GNULinux
 
     * PWD: comando não é reconhecido. Só é reconhecido quando digitado no Telnet e com espaço no final ("PWD "). Todos os outros comandos são reconhecidos, exceto ele. Deve-se revisar toda a arquivo de funções que chamam o comando e procurar algum erro. Todos os comandos de 3 caracteres estão funcionando corretamente e sendo reconhecidos (MKD, RMD).
 
@@ -48,7 +51,8 @@
 
     Demais funções, com exceção do STOR, estão funcionando. A RFC prevê que algumas funções adicionais sejam implementadas, possivelmente para evitar erros futuros, porém ainda não foram implementadas. Elas estão destacadas com caneta vermelha na olha da RFC impressa.
 
-6.32    - PASV Não FUNCIONAL
+6.32
+        - PASV Não FUNCIONAL
             * Foi encontrado um erro no comando PASV no qual o valor passado não pode ser lido. Mensagem de erro: "Passive mode address scan failure.Shouldn't happen!" no cliente. Esse erro vem, possivelmente, de um erro de tradução. Revisar arquivo 'porta.c' nas funções do PASV.
         - STOR não FUNCIONAL
             * Comando STOR parcialmente modificado. Implementada funcionalidade, porém não foi possível receber um arquivo, já que não se tem o tamanho dele. É preciso revisar o envio de arquivos pelo Stream Mode em C. Uma possível solução é receber bytes enquanto forem enviados.
@@ -61,7 +65,8 @@
         - MODE não será IMPLEMENTADO
             * Motivo: o cliente FTP padrão do Linux, e possivelmente do Windows também, aceita apenas o modo de transmissão Stream Mode. Logo, um comando que faz o servidor enviar em outros modos é desnecessário neste cenário específico.
 
-6.33    - PORT
+6.33
+        - PORT
             * Problema: o último parametro (p2) é recebido e, quando tiver apenas 2 caracteres, um novo caractere é adicionado ao final, fazendo com que a porta fique absurdamente grande e impossibilitando o inicio da conexão de dados
         - RECV 80% funcional
             * Arquivos .pptx, .rar, .zip chegam corrompidos ao destino e não podem ser recuperados.
@@ -101,3 +106,15 @@
             * problema de não reconhecimento corrigido fazendo uma atribuição NULL na última posição da string 'comando', já que PWD só tem 3 caracteres e comando espera receber 4. Então, o sistema verifica se a primeira letra é 'P', se a segunda é 'W' e se a terceira é 'D', caso afirmativo para todas, a posição 'comando[3] = NULL'.
         - PASV não funcional
             * Foi colocado, no inicio da função 'opPasv', o retorno da porta padrão de dados usada pelo servidor, que é PORTA+1.
+
+6.337
+        - QUIT corrigido
+            * Um problema no QUIT foi encontrado porque o servidor tornava o cliente correto offline.
+                ~ sempre que um cliente desconecta, seu status é retornado para zero.
+                ~ o sistema de status será mais utilizado quando forem implementadas ferramentas de paralelização. Isso evitará que mais de uma pessoa manipulem a mesma pasta ao mesmo tempo.
+            * O problema era que o valor do 'idCliente' era zerado, então ele sempre setava como offline o primeiro usuário (usuário zero).
+            * Quando um usuário de id diferente tentava fazer um segundo login, seu status ainda estava indicando que ele estava online. Isso fazia com que o servidor não liberasse o login.
+            * Agora, ao invés do 'idCliente' usado ser uma variável global do arquivo 'login.c', ele será um parametro apenas da função de finalizar. Foi também adicionada uma função que adiciona o 'idCliente' ao arquivo principal 'server.c'.
+        - Prints adicionais removidos
+            * Os printf adicionais, que foram colocados apenas para testes, foram removidos. Aparentemente todos os comandos (com exceção dos que foram reportados como NÃO FUNCIONAIS) estão funcionando normalmente.
+            * O servidor agora só exibe o mínimo de informação necessária para funcionar.

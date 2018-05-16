@@ -18,17 +18,17 @@ struct vetChar{
 int iniciarConexaoDados(int cliente, int port, char ipCliente[]);
 int calcPort(int val1, int val2);
 int calcPortPASV(int val, int set);
-void finalizarSessao();
+void finalizarSessao(int idCliente);
 void loopErro();
 char* readFileBytes(const char *name);
 
 
-void opQuit(int cliente){
+void opQuit(int cliente, int idCliente){
     int statusFinalizar;
     char msgEnvia[100];
     strcpy(msgEnvia, "221 Finalizando conexao\n");
     write(cliente, msgEnvia, strlen(msgEnvia)+1);
-    finalizarSessao();
+    finalizarSessao(idCliente);
     statusFinalizar = finalizarConexao();
     if(statusFinalizar != 0){
         printf("Erro ao finalizar conexão: pasta raiz não pode ser retornada\nFINALIZANDO SERVIDOR!\n");
@@ -45,7 +45,6 @@ int opPort(char portas[]){
     int porta1, porta2, port, tam;
     char aux1[20], aux2[20];
     i = 0, j=0;
-    printf("AQUI CHEGOU!\n: %s", portas);
     tam = strlen(portas);
     while((i<tam) && (j<4)){
         if(portas[i] == ',')
@@ -89,7 +88,6 @@ int opPort(char portas[]){
     }
 
 
-    printf("\naux1: %s\nAux2: %s\n", aux1, aux2);
     porta1 = atoi(aux1);
     porta2 = atoi(aux2);
     port = calcPort(porta1, porta2);
@@ -384,7 +382,6 @@ int opRmd(int cliente, char pasta[]){
     char msgEnvia[100];
 
     printf("RMD pasta \'%s\'\n", pasta);
-        printf("RMD confirmado pelo usuário na pasta \'%s\'\n", pasta);
         if(rmdir(pasta) == 0){
             printf("RMD pasta \'%s\' removida com sucesso\n", pasta);
             strcpy(msgEnvia, "250 pasta removida com sucesso\n"); // confirmação de exclusão
@@ -426,12 +423,12 @@ int opDele(int cliente, char arquivo[]){
 
     if(remove(arquivo) == 0){
         printf("DELE arquivo \'%s\' deletado com sucesso\n", arquivo);
-        strcpy(msgEnvia, "250 deletado com sucesso\n");   // confirmação de apagado
+        strcpy(msgEnvia, "250 Deletado com sucesso\n");   // confirmação de apagado
         write(cliente, msgEnvia, strlen(msgEnvia)+1);
         return 1;
     }else{
         printf("DELE erro ao deletar arquivo \'%s\'\n", arquivo);
-        strcpy(msgEnvia, "550 arquivo nao pode ser deletado\n");   // confirmação de erro
+        strcpy(msgEnvia, "550 Arquivo nao pode ser deletado\n");   // confirmação de erro
         write(cliente, msgEnvia, strlen(msgEnvia)+1);
         return 0;
     }

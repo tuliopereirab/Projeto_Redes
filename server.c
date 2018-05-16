@@ -24,7 +24,7 @@ int carregarClientes();
 int logar(char nome[], char senha[]);
 void finalizarSessao();
 int opLs(int cliente, int port, char ipCliente[]);
-void opQuit(int cliente);
+void opQuit(int cliente, int idCliente);
 int opCwd(int cliente, char pasta[]);
 int opCwdPonto(int cliente);
 int opPut(int cliente, char nomeArquivo[], char ipCliente[], int port);
@@ -34,6 +34,7 @@ int opRmd(int cliente, char pasta[]);
 int opMkd(int cliente, char pasta[]);
 int opDele(int cliente, char arquivo[]);
 int opPort(char portas[]);
+void finalizarSessao(int idCliente);
 //-------------------
 // INTERNAS
 void encontrarComando(char msg[]);
@@ -44,6 +45,7 @@ int finalizarConexao();
 void loopErro();
 //-------------------
 
+int idCliente;
 int pasta;
 int statusLogin=0;
 int statusServidor = 0;
@@ -127,9 +129,7 @@ void conversa(int cliente){
             msgRecebe[i] = NULL;
         read(cliente, msgRecebe, MAXBUF);
 
-        printf("RECEBE: %s\n", msgRecebe);
-
-        printf("Status login: %i\n", statusLogin);
+        printf("\nRECEBE: %s\n", msgRecebe);
 
         if((strlen(msgRecebe)) > 4){
             encontrarComando(msgRecebe);
@@ -244,7 +244,7 @@ void conversa(int cliente){
             case 99:
                 printf("QUIT solicitado pelo cliente\n\n");
                 statusLogin = 0;
-                opQuit(cliente);
+                opQuit(cliente, idCliente);
                 break;
             case 0:
                 printf("ERRO, comando digitado invalido\n\n");
@@ -284,6 +284,10 @@ int opUser(int cliente){
     if(status == 0)
         statusLogin = logar(usernameCliente, senhaCliente);
 
+    if((statusLogin == 1) || (statusLogin == 2)){
+        idCliente = pegarIdCliente(usernameCliente);
+        printf("ID cliente: %i\n", idCliente);
+    }
 
     if(statusLogin == 1){
         status = 0;

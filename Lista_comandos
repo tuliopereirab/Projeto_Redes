@@ -28,7 +28,7 @@ Comandos FTP:
 88 - usuário precisa de login - evita que o usuário use qualquer comando sem estar logado (FUNCIONAL)
 
 98 - NOOP - simplesmente o servidor responde um comando de "200 OK" ao cliente (FUNCIONAL - olhar comentário de upload 6.33)
-99 - QUIT - encerra a sessão do usuário, colocando seu status em zero e finalizando adequadamente a conexão (FUNCIONAL)
+99 - QUIT - encerra a sessão do usuário, colocando seu status em zero e finalizando adequadamente a conexão (FUNCIONAL - olhar comentário de upload 6.337)
 
 -- - MODE - define o modo de transferência (NÃO SERÁ IMPLEMENTADO - olhar comentário de upload 6.32)
 -- - TYPE - define o formado do arquivo a ser enviado (?) (NÃO SERÁ IMPLEMENTADO - olhar comentário de upload 6.33)
