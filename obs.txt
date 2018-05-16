@@ -118,3 +118,5 @@
         - Prints adicionais removidos
             * Os printf adicionais, que foram colocados apenas para testes, foram removidos. Aparentemente todos os comandos (com exceção dos que foram reportados como NÃO FUNCIONAIS) estão funcionando normalmente.
             * O servidor agora só exibe o mínimo de informação necessária para funcionar.
+6.338
+        - Nenhuma modificação significativa. 
