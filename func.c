@@ -21,6 +21,7 @@ int calcPortPASV(int val, int set);
 void finalizarSessao(int idCliente);
 void loopErro();
 char* readFileBytes(const char *name);
+char* correcaoPort(char aux[]);
 
 
 void opQuit(int cliente, int idCliente){
@@ -44,6 +45,7 @@ int opPort(char portas[]){
     int i, j;
     int porta1, porta2, port, tam;
     char aux1[20], aux2[20];
+    char *correcaoAux1, *correcaoAux2;
     i = 0, j=0;
     tam = strlen(portas);
     while((i<tam) && (j<4)){
@@ -60,6 +62,7 @@ int opPort(char portas[]){
     i++;
     while(portas[i] != '\0')
         aux2[j++] = portas[i++];
+    aux2[j] = '\0';
 
     tam = strlen(aux1);
     for(i=0; i<tam; i++){
@@ -87,6 +90,10 @@ int opPort(char portas[]){
         }
     }
 
+    correcaoAux1 = correcaoPort(aux1);
+    correcaoAux2 = correcaoPort(aux2);
+
+    printf("Aux corrigidos: %s\t%s\n", correcaoAux1, correcaoAux2);
 
     porta1 = atoi(aux1);
     porta2 = atoi(aux2);

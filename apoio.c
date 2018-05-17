@@ -14,3 +14,14 @@ char* readFileBytes(const char *name)    // Link de referencia da função está
     fclose(fl);
     return ret;
 }
+
+char* correcaoPort(char aux[]){
+    int i, tam;
+    tam = strlen(aux);
+    for(i=0; i<tam; i++)
+        if((aux[i] == '\n') || (aux[i] == ' ') || (isdigit((int)aux[i]) == 0)){
+            aux[i] = '\0';
+            i=tam;
+        }
+    return aux;
+}

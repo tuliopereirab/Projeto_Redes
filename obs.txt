@@ -141,3 +141,21 @@
             * ATENÇÃO:
                 ~ Com a função desativada, não existe o controle se o usuário está online ou não, já que a comparação de status só é feita quando a senha for aceita. Logo, como ainda só é permitida uma conexão, essa verificação não é necessária.
                 ~ Ela será necessária quando for possível conectar mais de um cliente simultâneo.
+
+6.340
+        - PORT problema corrigido!
+            * sempre que a segunda porta enviada pelo cliente é uma porta de 2 caracteres, a string dela recebe um digito adicional aleatório, o que faz com que a porta fique inválida.
+            * Para corrigir é preciso encontrar a raiz do problema.
+            * Para tentar corrigir, foi criada uma função de verificação de caracteres especiais na string, porém, como ela recebe um número adicional, o número é reconhecido e não é eliminado.
+            * Se a primeira string criada (aux2) já recebeu o número, é impossível prever que tem um número a mais e retirá-lo.
+            * Possibilidade:
+                ~ Existe a possibilidade de comparar o número da porta 'aux2' e, caso for maior que algum número, retirar o último caracter.
+                    > porém, as vezes, é um simples 17 que vira 170 e continua sendo um número baixo, porém inválido.
+                    > não é possível prever que recebeu um número a mais.
+                ~ Corrigir o erro de aquisição:
+                    > para isso, foi adicionado -1 no valor de tamanho da string que foi recebido, porém não mudou nada.
+            *** PROBLEMA CORRIGIDO!
+                ~ O problema do último caractere foi corrigido simplesmente colocando um '\0' ao final da string 'aux2'.
+        - ADICIONAIS
+            * Removidos printf que mostravam a senha do usuário cadastrada e recebida nos logs do servidor.
+                ~ eles foram colocados só para testes.

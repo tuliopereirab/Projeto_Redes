@@ -38,3 +38,4 @@ int calcPortPASV(int val, int set);
 //--------------------------
 // APOIO.c
 char* readFileBytes(const char *name);
+char* correcaoPort(char aux[]);

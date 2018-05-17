@@ -281,7 +281,6 @@ int opUser(int cliente){
             i++;
         }
         senhaCliente[i] = '\0';
-        printf("SenhaCliente: %s\n", senhaCliente);
         //strcpy(senhaCliente, parametro);
         status = 0;
     }else{
