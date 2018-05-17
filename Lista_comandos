@@ -20,7 +20,7 @@ Comandos FTP:
 30 - DELE - deletar arquivo (FUNCIONAL)
 
 40 - USER - usado para fazer login (FUNCIONAL)
-  * PASS - exigido para fazer login (FUNCIONAL - olhar comentário de upload 6.31)
+  * PASS - exigido para fazer login (DESATIVADO - olhar comentário de upload 6.339)
 41 - SYST - retorna o sistema onde o servidor está rodando (FUNCIONAL)
 50 - PORT - define a porta usada pelo cliente para receber a conexão de dados (FUNCIONAL - olhar comentário de upload 6.33)
 51 - PASV - deixa nas mãos do servidor definir a porta para conexão de dados (NÃO FUNCIONAL - olhar comentário de upload 6.32)

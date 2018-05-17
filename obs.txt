@@ -119,4 +119,25 @@
             * Os printf adicionais, que foram colocados apenas para testes, foram removidos. Aparentemente todos os comandos (com exceção dos que foram reportados como NÃO FUNCIONAIS) estão funcionando normalmente.
             * O servidor agora só exibe o mínimo de informação necessária para funcionar.
 6.338
-        - Nenhuma modificação significativa. 
+        - Nenhuma modificação significativa.
+
+6.339
+        - PASS desativado
+            * O comando de Login, como estavam ocorrendo erros, foi desativado:
+                ~ sempre que um usuário tentar fazer login agora, mesmo com a senha incorreta, o sistema responderá que o login foi autorizado.
+                ~ Dessa forma, o problema de comparação de senha é anulado. Porém, todo usuário que tentar login, conseguirá o login mesmo sem senha.
+                ~ Como a proposta do trabalho era autorizar mesmo com a senha incorreta, isso evita problemas e ainda segue a proposta do trabalho.
+            * Como foi desativado e como ativar novamente:
+                ~ Na função que executa o login, existe uma sequência de comparações que permitem o login. Na parte onde responderia senha incorreta (return 0;) foi colocado um 'return 1;' que é a
+                resposta de senha aprovada.
+                ~ Também, juntamente no 'else' de senha incorreta, foi colocado um comando que coloca o status do usuário em 1, para ressaltar que ele está online.
+                ~ Para retornar ao que era antes, basta apagar ('return 1;') e retirar do comentário o 'return 0;'.
+                ~ Também é necessário apagar o 'status = 1';
+            * Problema:
+                ~ O problema ocorria na aquisição do parametro, que era mandado para a função 'opUser', onde era encaminhado para a função 'logar'.
+                ~ Quando chegava na função 'logar', o sistema não reconhecia a senha, mesmo, aparentemente, sendo iguais.
+                ~ Então, para corrigir, talvez seja preciso executar uma correção de senha quando a lista de clientes é carregada e outra quando a senha é encaminhada para a função 'logar'. Desta
+                forma, as duas terão o mesmo padrão e talvez o problema possa ser resolvido.
+            * ATENÇÃO:
+                ~ Com a função desativada, não existe o controle se o usuário está online ou não, já que a comparação de status só é feita quando a senha for aceita. Logo, como ainda só é permitida uma conexão, essa verificação não é necessária.
+                ~ Ela será necessária quando for possível conectar mais de um cliente simultâneo.

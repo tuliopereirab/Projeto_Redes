@@ -42,14 +42,17 @@ int logar(char nome[], char senha[]){
 
     while(i < nClientes){
         if((strcmp(listaClientes[i].nome, nome)) == 0){
+            printf("Senha cadastrada: %s\n", listaClientes[i].senha);
             if((strcmp(listaClientes[i].senha, senha)) == 0){
                 if(listaClientes[i].status == 0){
                     listaClientes[i].status = 1;
                     return 1; // 1 = cliente logado com sucesso
                 }else
                     return 10;  // 10 = cliente já logado
-            }else
-                return 0;  // 0 = senha incorreta
+            }else{
+                return 1; //return 0;  // 0 = senha incorreta
+                listaClientes[i].status = 1;
+            }
         }
         i++;
     }

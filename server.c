@@ -263,7 +263,7 @@ int opUser(int cliente){
     char senhaCliente[20];
     char nomePasta[50];
     char usernameCliente[20];
-    int status;
+    int status, i;
 
     strcpy(usernameCliente, parametro);
     printf("Cliente \'%s\' tentando login\n", usernameCliente);
@@ -275,7 +275,14 @@ int opUser(int cliente){
     encontrarComando(msgRecebe);
     if((strcmp(comando, "PASS")) == 0){
         encontrarParametro(msgRecebe);
-        strcpy(senhaCliente, parametro);
+        i = 0;
+        while(parametro[i] != '\0'){
+            senhaCliente[i] = parametro[i];
+            i++;
+        }
+        senhaCliente[i] = '\0';
+        printf("SenhaCliente: %s\n", senhaCliente);
+        //strcpy(senhaCliente, parametro);
         status = 0;
     }else{
         status = 30;
@@ -388,7 +395,12 @@ void encontrarParametro(char msg[]){
 
     i = strlen(comando)+1;
     while(i<(tam-2)){
-        parametro[j] = msg[i];
+        if(msg[i] != '\n')
+            parametro[j] = msg[i];
+        else{
+            parametro[j] = NULL;
+            i=tam;
+        }
         i++;
         j++;
     }
