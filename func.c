@@ -93,7 +93,7 @@ int opPort(char portas[]){
     correcaoAux1 = correcaoPort(aux1);
     correcaoAux2 = correcaoPort(aux2);
 
-    printf("Aux corrigidos: %s\t%s\n", correcaoAux1, correcaoAux2);
+    //printf("Aux corrigidos: %s\t%s\n", correcaoAux1, correcaoAux2);
 
     porta1 = atoi(aux1);
     porta2 = atoi(aux2);
@@ -166,7 +166,7 @@ int opPasv(int cliente, int porta, char ipCliente[]){
         }
     }
 
-    printf("Verificacao: \nH1: %s\nH2: %s\nH3: %s\nH4: %s\n------\n", h1,h2,h3,h4);
+    //printf("Verificacao: \nH1: %s\nH2: %s\nH3: %s\nH4: %s\n------\n", h1,h2,h3,h4);
     p1int = calcPortPASV(port, 0);
     p2int = calcPortPASV(port, 1);
 

@@ -23,7 +23,7 @@ int i1, i2, iConc;
 
 int calcPortPASV(int val, int set){
     int i, port1, port2;
-    printf("PORTA: %i\n", val);
+    printf("PASV porta: %i\n", val);
     zerar();
     convertToHex(val, 2);
     arrumaPasv();
@@ -47,7 +47,7 @@ int calcPort(int val1, int val2){
     inverter();
     concatena();
     port = convertToDec();
-    printf("PORTA: %i\n", port);
+    //printf("PORTA: %i\n", port);
     return port;
 }
 

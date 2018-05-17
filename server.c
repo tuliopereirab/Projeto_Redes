@@ -78,9 +78,8 @@ int main(){
         return 0;
     }
 
-    myIp = getMyIp();
 
-    //printf("Meu IP: %s\n", myIp);
+
 
     statusClientes = carregarClientes();
 
@@ -99,7 +98,8 @@ int main(){
     listen(s, 5);
     printf("--------------------------------------------------------------\n");
     printf("Servidor ONLINE\n");
-    printf("--------------------------------------------------------------\n");
+    myIp = getMyIp();
+    printf("\n--------------------------------------------------------------\n");
 
     while(1){
         client_s = accept(s, (struct sockaddr *)&client, &addrlen);

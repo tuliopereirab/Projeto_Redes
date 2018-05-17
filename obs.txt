@@ -171,4 +171,8 @@
             * Ele serve simplesmente para informar à quem iniciar o servidor.
             * Problema:
                 ~ ele deveria retornar o valor para a variável 'myIp' do 'server.c', porém retorna NULL.
-                ~ Caso retornasse, ele poderia ser utilizado para outras coisas, como, talvez, o PASV. 
+                ~ Caso retornasse, ele poderia ser utilizado para outras coisas, como, talvez, o PASV.
+
+6.3415
+        - Foram arrumadas apenas algumas futilidades para ficar mais bonita a apresentação do servidor.
+        - Foram mantidos apenas os printf de verificação do PASV.
