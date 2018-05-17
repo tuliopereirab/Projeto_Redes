@@ -5,10 +5,11 @@
 #include "connection.c"
 #include "porta.c"
 #include "apoio.c"
+#include "getMyIp.c"
 
 // LOGIN.C
 int carregarClientes();
-void finalizarSessao(int idCliente);
+int finalizarSessao(int idCliente);
 int logar(char nome[], char senha[]);
 int pegarIdCliente(char nome[]);
 //--------------------------
@@ -39,3 +40,6 @@ int calcPortPASV(int val, int set);
 // APOIO.c
 char* readFileBytes(const char *name);
 char* correcaoPort(char aux[]);
+//--------------------------
+// GETMYIP.C
+char* getMyIp();

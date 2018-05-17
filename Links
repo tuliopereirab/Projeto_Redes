@@ -1,2 +1,3 @@
-https://stackoverflow.com/questions/16928517/converting-a-decimal-to-a-hexadecimal-numbers
-http://www.codecodex.com/wiki/Read_a_file_into_a_byte_array
+* Converter um valor decimal em uma string Hexadecimal ('convertToHex' no arquivo 'porta.c'): https://stackoverflow.com/questions/16928517/converting-a-decimal-to-a-hexadecimal-numbers
+* Ler um arquivo em um vetor de bytes ('readFileBytes' no arquivo 'apoio.c'): http://www.codecodex.com/wiki/Read_a_file_into_a_byte_array
+* Get my Ip (arquivo 'getMyIp.c'): https://www.binarytides.com/get-local-ip-c-linux/

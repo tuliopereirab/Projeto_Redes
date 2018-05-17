@@ -35,6 +35,7 @@ int opMkd(int cliente, char pasta[]);
 int opDele(int cliente, char arquivo[]);
 int opPort(char portas[]);
 void finalizarSessao(int idCliente);
+char* getMyIp();
 //-------------------
 // INTERNAS
 void encontrarComando(char msg[]);
@@ -56,6 +57,7 @@ int s;
 struct sockaddr_in client;
 int addrlen;
 char ipCliente[INET_ADDRSTRLEN];
+char *myIp = NULL;
 
 int main(){
     char nomeCliente[20], nomePasta[50];
@@ -76,6 +78,9 @@ int main(){
         return 0;
     }
 
+    myIp = getMyIp();
+
+    //printf("Meu IP: %s\n", myIp);
 
     statusClientes = carregarClientes();
 

@@ -18,7 +18,7 @@ struct vetChar{
 int iniciarConexaoDados(int cliente, int port, char ipCliente[]);
 int calcPort(int val1, int val2);
 int calcPortPASV(int val, int set);
-void finalizarSessao(int idCliente);
+int finalizarSessao(int idCliente);
 void loopErro();
 char* readFileBytes(const char *name);
 char* correcaoPort(char aux[]);
@@ -165,6 +165,8 @@ int opPasv(int cliente, int porta, char ipCliente[]){
             z++;
         }
     }
+
+    printf("Verificacao: \nH1: %s\nH2: %s\nH3: %s\nH4: %s\n------\n", h1,h2,h3,h4);
     p1int = calcPortPASV(port, 0);
     p2int = calcPortPASV(port, 1);
 
@@ -190,7 +192,7 @@ int opPasv(int cliente, int porta, char ipCliente[]){
         if((h2[i] != '0') && (h2[i] != '1') && (h2[i] != '2') && (h2[i] != '3') && (h2[i] != '4') && (h2[i] != '5') && (h2[i] != '6') && (h2[i] != '7') && (h2[i] != '8') && (h2[i] != '9'))
             h2[i] = NULL;
         if((h3[i] != '0') && (h3[i] != '1') && (h3[i] != '2') && (h3[i] != '3') && (h3[i] != '4') && (h3[i] != '5') && (h3[i] != '6') && (h3[i] != '7') && (h3[i] != '8') && (h3[i] != '9'))
-            h3[i] = NULL;
+            h3[i] = '\0';
         if((h4[i] != '0') && (h4[i] != '1') && (h4[i] != '2') && (h4[i] != '3') && (h4[i] != '4') && (h4[i] != '5') && (h4[i] != '6') && (h4[i] != '7') && (h4[i] != '8') && (h4[i] != '9'))
             h4[i] = NULL;
     }

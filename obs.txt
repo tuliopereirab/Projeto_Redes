@@ -159,3 +159,16 @@
         - ADICIONAIS
             * Removidos printf que mostravam a senha do usuário cadastrada e recebida nos logs do servidor.
                 ~ eles foram colocados só para testes.
+
+6.341
+        - PASV
+            * comando continua com problemas
+            * Quando enviado ao cliente, ele não é lido corretamente, mesmo que esteja exatamente como deveria estar.
+            * Possibilidade do que causa o problema:
+                ~ é possível que o problema seja causado quando acontece a leitura do endereço IP do cliente, já que a parte H3 sempre é gerada com um valor estranho.
+        - Printf do IP adicionado
+            * Adicionado, ao iniciar o servidor, um printf que mostra o IP atual de rede do servidor, caso exista.
+            * Ele serve simplesmente para informar à quem iniciar o servidor.
+            * Problema:
+                ~ ele deveria retornar o valor para a variável 'myIp' do 'server.c', porém retorna NULL.
+                ~ Caso retornasse, ele poderia ser utilizado para outras coisas, como, talvez, o PASV. 
