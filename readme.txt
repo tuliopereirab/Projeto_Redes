@@ -106,7 +106,24 @@ REFERẼNCIAS:
     
     Nos links acima, estão também especificados o arquivo onde se encontra a função e o nome exato da função implementada.
 
-
+-----------------------------------------------------------------------------------------------
+VERSIONAMENTO:
+    Todos os arquivos e as versões do sistema podem ser encontrados nos links abaixo:
+        - Versões iniciais de implementaçõa: https://drive.google.com/open?id=1D1vun6-XaiLjwKqE6b1V1TazfjXEN-KQ
+        - Versões superiores à 6.2: https://github.com/tuliopereirab/Projeto_Redes
+    
+    ** Versões iniciais: cada versão foi separada em uma pasta individual.
+         ~ inicialmente, pensou-se que a proposta do projeto era fazer um servidor e um cliente para funcionar neste servidor. Então, as versões iniciais (até a v5.5) contêm duas subpastas à pasta da versão: "Cliente" e "Server".
+            . Na versão 5.5, existe um cliente e um servidor funcional, que funcionam juntos e que é possível transferir qualquer arquivo e executar praticamente todos os comandos implementados. 
+            . Utilizando todos os métodos de execução do servidor no cliente e ativando ambos (primeiro o servidor e depois o cliente) é possível estabelecer uma conexão que funciona baseado no programa cliente do FTP. Contudo, nenhum dos comandos enviados pelo cliente para o servidor e do servidor para o cliente seguem o protocolo FTP. Várias vezes, invés do servidor responde um código de três números e uma mensagem, o servidor simplesmente responde "ok" ou "error", ou ainda "erro". Não é seguido um padrão de mensagens de nenhum dos lados, porém sempre o outro lado consegue entender perfeitamente. Se for utilizado o cliente padrão do Linux de FTP para conectar ao servidor inicial, a conexão acontecerá, porém nenhuma das mensagens funcionará, nem dos cliente para o servidor e muito menos do servidor para o cliente.
+            . Então, o servidor foi modificado em grande escala para suportar o cliente FTP e seguir a RFC à risca. A partir da versão 6, o servidor não pode mais ser executado juntamente com o cliente. Então, nas versões acima da v6, o cliente foi totalmente descartado, tanto que nem foi dado upload dele.
+            
+    ** Versões superiores à 6.2: as versões passaram a ser colocadas no Github para melhor versionamento e acesso.
+        ~ Como dito anteriormente, o cliente criado foi totalmente extinto e não pode ser executado juntamente com o servidor atual da versão, pois nenhum conseguirá conversar com o outro.
+        ~ Todos os comentários de modificações e observações a partir da versão 6.2 podem ser encontrados nos próprios 'commits' do Github e também no arquivo obs.txt.
+        ~ O arquivo "Lista_comando" contém cada comando implementado e sua opção (que é usada na função "conversar()" para definir o 'switch' que levará para a função referente ao comando). Também, no mesmo arquivo, tem uma breve explicação do que o comando faz e o status de execução dele (funcional, não funcional, com pequenos erros). Alguns comandos que foram modificados recentemente possuem também, ao lado do seu status, uma referência que diz qual 'commit' contém informações da última modificação. Basta ler a versão e procurar o 'commit' indicado. 
+        ~ Também pode ser encontrado um arquivo com o nome "Links", que apresenta o link de todas as funções que foram copiadas da Internet. 
+            
     
     
         
