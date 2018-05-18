@@ -18,12 +18,12 @@ int opUser(int cliente);
 void loopErro();
 //--------------------------
 // FUNC.C
-int opLs(int cliente, int port, char ipCliente[]);
+int opLs(int cliente, int port, char ipCliente[], int passiveMode);
 void opQuit(int cliente, int idCliente);
 int opCwd(int cliente, char pasta[]);
 int opCwdPonto(int cliente);
-int opPut(int cliente, char nomeArquivo[], char ipCliente[], int port);
-int opGet(int cliente, char ipCliente[], int port, char nomeArquivo[]);
+int opPut(int cliente, char nomeArquivo[], char ipCliente[], int port, int passiveMode);
+int opGet(int cliente, char ipCliente[], int port, char nomeArquivo[], int passiveMode);
 int opPwd(int cliente);
 int opRmd(int cliente, char pasta[]);
 int opMkd(int cliente, char pasta[]);
@@ -32,6 +32,7 @@ int opPort(char portas[]);
 //--------------------------
 // CONNECTION.C
 int iniciarConexaoDados(int cliente, int port, char ipCliente[]);
+int conexaoModoPassivo(int cliente, int port);
 //--------------------------
 // PORTA.C
 int calcPort(int val1, int val2);

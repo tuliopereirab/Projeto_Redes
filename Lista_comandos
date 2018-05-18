@@ -10,7 +10,7 @@ Comandos FTP:
 5 - CDUP - retornar para o diretório acima (FUNCIONAL)
 6 - PWD - envia o caminho do diretorio atual (FUNCIONAL)
 
-10 - STOR [local do arquivo]  - upload pro servidor (NÃO FUNCIONAL - olhar comentário de upload 6.33)
+10 - STOR [local do arquivo]  - upload pro servidor (50% FUNCIONAL - olhar comentário de upload 6.3418)
 11 - RETR [nome do arquivo]  - download do servidor (80% FUNCIONAL - olhar comentário de upload 6.33)
 
 
@@ -23,7 +23,7 @@ Comandos FTP:
   * PASS - exigido para fazer login (DESATIVADO - olhar comentário de upload 6.339)
 41 - SYST - retorna o sistema onde o servidor está rodando (FUNCIONAL)
 50 - PORT - define a porta usada pelo cliente para receber a conexão de dados (FUNCIONAL - olhar comentário de upload 6.340)
-51 - PASV - deixa nas mãos do servidor definir a porta para conexão de dados (NÃO FUNCIONAL - olhar comentário de upload 6.32)
+51 - PASV - deixa nas mãos do servidor definir a porta para conexão de dados (NÃO FUNCIONAL - olhar comentário de upload 6.3418)
 
 88 - usuário precisa de login - evita que o usuário use qualquer comando sem estar logado (FUNCIONAL)
 

@@ -39,3 +39,23 @@ int iniciarConexaoDados(int cliente, int port, char ipCliente[]){
     }
 
 }
+
+int conexaoModoPassivo(int cliente, int port){
+    int s, dataCon;
+    struct sockaddr_in self;
+    int addrlen;
+    struct sockaddr_in client;
+    addrlen = sizeof(client);
+    s = socket(AF_INET, SOCK_STREAM, 0);
+    bzero(&self, sizeof(self));
+    self.sin_family = AF_INET;
+    self.sin_port = htons(port);
+    self.sin_addr.s_addr = INADDR_ANY;
+
+    bind(s, (struct sockaddr *)&self, sizeof(self));
+    listen(s, 5);
+    printf("PASV aguardando conexão do cliente\n");
+    dataCon = accept(s, (struct sockaddr *)&client, &addrlen);
+    printf("PASV cliente se conectou\n");
+    return dataCon;
+}

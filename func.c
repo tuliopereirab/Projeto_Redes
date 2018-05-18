@@ -22,6 +22,7 @@ int finalizarSessao(int idCliente);
 void loopErro();
 char* readFileBytes(const char *name);
 char* correcaoPort(char aux[]);
+int conexaoModoPassivo(int cliente, int port);
 
 
 void opQuit(int cliente, int idCliente){
@@ -101,7 +102,7 @@ int opPort(char portas[]){
     return port;
 }
 
-int opLs(int cliente, int port, char ipCliente[]){
+int opLs(int cliente, int port, char ipCliente[], int passiveMode){
     printf("LIST solicitado\n");
 
     struct stat obj;
@@ -142,7 +143,10 @@ int opPasv(int cliente, int porta, char ipCliente[]){
     char h1[4], h2[4], h3[4], h4[4], p1[7], p2[7];
     int i, j=0, z=0, p1int, p2int;
     char msgEnviar[100];
-    int port = porta+1;
+    int port = 0;
+    while(port < 1023)
+        port = rand() % 65000;
+    printf("PORTA RANDOMICA: %i\n", port);
     for(i=0; i<strlen(ipCliente); i++){
         if(ipCliente[i] == '.'){
             j++;
@@ -196,9 +200,10 @@ int opPasv(int cliente, int porta, char ipCliente[]){
         if((h4[i] != '0') && (h4[i] != '1') && (h4[i] != '2') && (h4[i] != '3') && (h4[i] != '4') && (h4[i] != '5') && (h4[i] != '6') && (h4[i] != '7') && (h4[i] != '8') && (h4[i] != '9'))
             h4[i] = NULL;
     }
+    //h3[1] = '\0';
 
     printf("h1: %s\nh2: %s\nh3: %s\nh4: %s\np1: %s\np2: %s\n", h1, h2, h3, h4, p1, p2);
-    strcpy(msgEnviar, "227 Entrando em modo passivo (");
+    strcpy(msgEnviar, "227 Entering Passive Mode (");
     strcat(msgEnviar, h1);
     strcat(msgEnviar, ",");
     strcat(msgEnviar, h2);
@@ -210,12 +215,12 @@ int opPasv(int cliente, int porta, char ipCliente[]){
     strcat(msgEnviar, p1);
     strcat(msgEnviar, ",");
     strcat(msgEnviar, p2);
-    strcat(msgEnviar, ")\n");
+    strcat(msgEnviar, ").\n");
 
     printf("MENSAGEM ENVIAR: %s\n", msgEnviar);
     write(cliente, msgEnviar, strlen(msgEnviar)+1);
 
-    return 1;
+    return port;
 }
 
 
@@ -255,16 +260,17 @@ int opCwdPonto(int cliente){
     }
 }
 
-int opPut(int cliente, char nomeArquivo[], char ipCliente[], int port){
+int opPut(int cliente, char nomeArquivo[], char ipCliente[], int port, int passiveMode){
     printf("PUT aguardando arquivo\n");
     int dataCon;
-    int tamanho, fileh, i;
+    int tamanho, fileh, i, j, z;
     ssize_t tamT;
-    char *arquivo;
-    //int arquivo;
+    char *arquivo = NULL;
+    //int *arquivo = NULL;
     char msgEnvia[100];
     char temp[100];
     struct vetChar *vet;
+    int tamArq;
     dataCon = iniciarConexaoDados(cliente, port, ipCliente);
 
     if(dataCon == 0){
@@ -273,6 +279,28 @@ int opPut(int cliente, char nomeArquivo[], char ipCliente[], int port){
     }
 
     printf("PUT recebendo arquivo \'%s\'\n", nomeArquivo);
+    /*i = 1;
+    tamT = read(dataCon, temp, 1);
+    while(tamT != 0){
+        if(arquivo == NULL)
+            arquivo = (char*)malloc(sizeof(char)*8);
+        else
+            arquivo = realloc(arquivo, sizeof(char)*8*i);
+        z = 0;
+        for(j=(8*(i-1)); j<(8*i); i++){
+            arquivo[j] = temp[z];
+            z++;
+        }
+        i++;
+        tamT = read(dataCon, temp, 1);
+    }
+    printf("Recebeu!\n");
+    tamArq = 8*(i-1);
+    fileh = open(nomeArquivo, O_CREAT | O_EXCL | O_WRONLY, 0666);
+    for(i=0; i<tamArq; i++){
+        write(fileh, arquivo[i], sizeof(char), 0);
+    }
+    close(fileh);*/
     //read(cliente, &tamanho, sizeof(int));
     //arquivo = malloc(sizeof(char)*8);
     vet = malloc(sizeof(struct vetChar));
@@ -286,7 +314,13 @@ int opPut(int cliente, char nomeArquivo[], char ipCliente[], int port){
         i++;
         vet = realloc(vet, sizeof(struct vetChar)*i);
     }
-
+    printf("Recebeu!\n");
+    tamArq = 8*(i-1);
+    fileh = open(nomeArquivo, O_CREAT | O_EXCL | O_WRONLY, 0666);
+    for(i=0; i<tamArq; i++){
+        write(fileh, vet[i].byte, sizeof(char), 0);
+    }
+    close(fileh);
     /*read(dataCon, temp, sizeof(char)*8);
     printf("Recebeu: %s\n", temp);
     i=1;
@@ -306,16 +340,16 @@ int opPut(int cliente, char nomeArquivo[], char ipCliente[], int port){
     read(dataCon, arquivo, tamanho);
     */
 
-    fileh = open(nomeArquivo, O_CREAT | O_EXCL | O_WRONLY, 0666);
+    /*fileh = open(nomeArquivo, O_CREAT | O_EXCL | O_WRONLY, 0666);
     write(fileh, arquivo, tamanho, 0);
-    close(fileh);
+    close(fileh);*/
     strcpy(msgEnvia, "250 arquivo recebido\n");
     write(cliente, msgEnvia, strlen(msgEnvia)+1);
     printf("PUT arquivo recebido\n");
     return 1;
 }
 
-int opGet(int cliente, char ipCliente[], int port, char nomeArquivo[]){
+int opGet(int cliente, char ipCliente[], int port, char nomeArquivo[], int passiveMode){
     printf("GET solicitado\n");
     char msgEnvia[100];
     struct stat obj;
@@ -332,7 +366,10 @@ int opGet(int cliente, char ipCliente[], int port, char nomeArquivo[]){
         return 0;
     }
 
-    dataCon = iniciarConexaoDados(cliente, port, ipCliente);
+    if(passiveMode == 0)
+        dataCon = iniciarConexaoDados(cliente, port, ipCliente);
+    else
+        dataCon = conexaoModoPassivo(cliente, port);
 
     if(dataCon == 0){
         printf("ERRO na conexao de dados, GET finalizado\n");

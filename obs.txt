@@ -178,4 +178,17 @@
         - Foram mantidos apenas os printf de verificação do PASV.
 
 6.3416
-        - Inserção do arquivo "readme.txt" que fala tudo sobre o servidor e como manipulá-lo.  
+        - Inserção do arquivo "readme.txt" que fala tudo sobre o servidor e como manipulá-lo.
+
+6.3417
+        - Inserção de alterações no arquivo "readme.txt".
+
+6.3418
+        - PASV
+            * para tentar corrigir o problema de scan de endereço enviado pelo comando, foi criada uma função que aguarda a conexão do cliente, porém ela só é chamada no GET.
+            * O problema de endereço persiste, pois o cliente simplesmente não entende que precisa pegar o endereço.
+        - STOR
+            * O envio do arquivo foi bem sucedido, o arquivo foi montado com sucesso e permaneceu com o mesmo tamanho do arquivo inicial enviado.
+            * Porém, utilizando o comando "diff", percebeu-se que os arquivos eram diferentes.
+            * Abrindo o conteúdo do arquivo que chegou na pasta do cliente, não foi possível ler o que foi enviado.
+    

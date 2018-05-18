@@ -23,12 +23,12 @@ int finalizarConexao();
 int carregarClientes();
 int logar(char nome[], char senha[]);
 void finalizarSessao();
-int opLs(int cliente, int port, char ipCliente[]);
+int opLs(int cliente, int port, char ipCliente[], int passiveMode);
 void opQuit(int cliente, int idCliente);
 int opCwd(int cliente, char pasta[]);
 int opCwdPonto(int cliente);
-int opPut(int cliente, char nomeArquivo[], char ipCliente[], int port);
-int opGet(int cliente, char ipCliente[], int port, char nomeArquivo[]);
+int opPut(int cliente, char nomeArquivo[], char ipCliente[], int port, int passiveMode);
+int opGet(int cliente, char ipCliente[], int port, char nomeArquivo[], int passiveMode);
 int opPwd(int cliente);
 int opRmd(int cliente, char pasta[]);
 int opMkd(int cliente, char pasta[]);
@@ -58,11 +58,12 @@ struct sockaddr_in client;
 int addrlen;
 char ipCliente[INET_ADDRSTRLEN];
 char *myIp = NULL;
+int passiveMode = 0;
 
 int main(){
     char nomeCliente[20], nomePasta[50];
     int s, client_s;
-    struct sockaddr_in self/*, client*/;
+    struct sockaddr_in self;
     addrlen = sizeof(client);
     int status;
     char msgEnviar[100];
@@ -182,7 +183,7 @@ void conversa(int cliente){
 
         switch(op){
             case 1:
-                status = opLs(cliente, port, ipCliente);
+                status = opLs(cliente, port, ipCliente, passiveMode);
                 break;
             case 4:
                 status = opCwd(cliente, parametro);
@@ -204,10 +205,10 @@ void conversa(int cliente){
                 status = opPwd(cliente);
                 break;
             case 10:
-                status = opPut(cliente, parametro, ipCliente, port);
+                status = opPut(cliente, parametro, ipCliente, port, passiveMode);
                 break;
             case 11:
-                status = opGet(cliente, ipCliente, port, parametro);
+                status = opGet(cliente, ipCliente, port, parametro, passiveMode);
                 break;
             case 20:
                 status = opRmd(cliente, parametro);
@@ -234,9 +235,12 @@ void conversa(int cliente){
                 printf("PORT porta redefida para %i\n", port);
                 strcpy(msgEnvia, "200 porta redefinida\n");
                 write(cliente, msgEnvia, strlen(msgEnvia)+1);
+                passiveMode = 0;
                 break;
             case 51:
-                status = opPasv(cliente, PORTA, ipCliente);
+                port = opPasv(cliente, PORTA, ipCliente);
+                printf("Porta: %i\n", port);
+                passiveMode = 1;
                 break;
             case 70:
                 strcpy(msgEnvia, "530 usuario nao logado\n");
@@ -249,6 +253,7 @@ void conversa(int cliente){
             case 99:
                 printf("QUIT solicitado pelo cliente\n\n");
                 statusLogin = 0;
+                passiveMode = 0;
                 opQuit(cliente, idCliente);
                 break;
             case 0:
