@@ -1,0 +1,138 @@
+(i) INTEGRANTES DA EQUIPE DE PROJETO:
+    - Tulio Pereira Bitencourt, matrícula 151150796; e
+    - Eduardo Klein Pandolfo, matrícula 151150286.
+
+--------------------------------------------------------------------------------
+
+(ii) PROCESSO DE COMPILAÇÃO e EXECUÇÃO:
+
+* Requisitos do sistema: 
+    - Estar rodando um sistema Linux;
+    - Possuir o compilador GCC para arquivos .c.
+==========================
+* Sistema utilizado para o passo a passo: Linux Ubuntu v18.02 LTS
+==========================
+****** ATENÇÃO: o servidor só funcionará corretamente se for encontrada, no 
+interior de sua pasta raiz, a subpasta "pastasClientes" com o arquivo texto 
+"clientesCadastrados.txt"
+==========================
+* Passo a passo de como compilar:
+    1. Abra o terminal (CTRL + ALT + T [padrão]);
+    2. Mova-se, utilizando o comando 'cd', até a pasta onde estão localizados 
+os arquivos .c que compõem o servidor;
+    3. Estando na pasta, digite no terminal do Linux o seguinte comando:
+        "gcc *.c header.h -o Server" - sem as aspas.
+    4. Após executar a compilação, será criado um arquivo executável chamado 
+"Server"dentro da pasta onde está localizado;
+    5. Pronto, o servidor já está compilado.
+==========================
+* Executar o servidor:
+    1. Utilize, na pasta onde está o executável "Server", o comando:
+        "./Server"
+    2. O servidor será, então, iniciado e estará pronto para receber conexões.
+==========================
+* Passo a passo de como conectar:
+    1. Abra um novo terminal (pode ser em outro computador que esteja ligado na 
+mesma rede do servidor);
+    2,1. Caso seja o mesmo computador:
+        ~ digite no terminal o comando
+            "ftp localhost 8080"
+    2,2. Caso seja em outro computador:
+        ~ ao ser iniciado, o servidor apresentou um endereço IP de sua rede 
+local;
+        ~ Copie este endereço IP no comando à seguir:
+            "ftp <endereco_ip> 8080
+    3. Ao conectar-se ao servidor, será solicitado um nome de usuário;
+    4. Após, será solicitada a senha para o usuário;
+    5. Caso o usuário ainda não esteja cadastrado, o servidor criará um 
+cadastro e pasta para o usuário na pasta raiz do servidor;
+    6. Está pronto para ser utilizado, conforme os comandos implementados no 
+servidor. 
+
+--------------------------------------------------------------------------------
+
+(iii) FRASE DE DIREITOS AUTORAIS: 
+    
+    Este projeto foi desenvolvido integralmente pela equipe, sem ajuda não 
+autorizada de alunos não membros do projeto no processo de codificação.
+
+--------------------------------------------------------------------------------
+
+(iv) REFERÊNCIAS:
+
+    Algumas funções presentes no servidor tiveram suas lógicas copiadas 
+exatamente da internet, porém adaptadas para funcionarem junto com as outras. 
+Todas as funções que se encaixam nisso possuem, ao lado de suas declarações, um 
+comentário dizendo que foi copiada da internet e que o link de referência está 
+no arquivo "Links". Além do arquivo "Links", os links podem ser encontrados 
+abaixo:
+    
+    * Converter um valor decimal em uma string Hexadecimal ('convertToHex' no 
+arquivo 'porta.c'): 
+https://stackoverflow.com/questions/16928517/converting-a-decimal-to-a-
+hexadecimal-numbers
+    
+    * Ler um arquivo em um vetor de bytes ('readFileBytes' no arquivo 
+'apoio.c'): http://www.codecodex.com/wiki/Read_a_file_into_a_byte_array
+    
+    * Get my Ip (arquivo 'getMyIp.c'): 
+https://www.binarytides.com/get-local-ip-c-linux/
+    
+    Nos links acima, estão também especificados o arquivo onde se encontra a 
+função e o nome exato da função implementada.
+
+--------------------------------------------------------------------------------
+
+(v) VERSIONAMENTO: 
+
+    Todos os arquivos e as versões do sistema podem ser encontrados nos links 
+abaixo:
+        - Versões iniciais de implementação: 
+https://drive.google.com/open?id=1D1vun6-XaiLjwKqE6b1V1TazfjXEN-KQ
+        - Versões superiores à 6.2: 
+https://github.com/tuliopereirab/Projeto_Redes
+
+--------------------------------------------------------------------------------
+ (vi) OBSERVAÇÕES ADICIONAIS PERTINENTES:
+ 
+ - O servidor está, atualmente, configurado para receber a conexão de controle 
+na porta 8080. Para alterar essa configuração, basta redefinir a definição 
+dentro do arquivo "server.c", linha 14. O valor da porta deve ser utilizado para 
+a conexão com o comando "ftp <endereco_ip> <porta>".
+    
+    - Os arquivos que compõem o servidor, atualmente, na versão 6.34, são:
+        ~ "server.c"   // arquivo base, recebe as conexões e faz o login do 
+usuário, é onde recebe os comandos enviados
+        ~ "func.c"     // contém as funções de todos os comandos implementados 
+(exceto USER)
+        ~ "login.c"   // usado para o gerenciamento de login e dos usuários
+        ~ "porta.c"     // usado para as operações específicas dos comandos 
+PORT e PASV
+        ~ "connection.c"   // usado para fazer a conexão de dados
+        ~ "apoio.c"      // possui algumas funções de apoio utilizadas por 
+diferentes funções dentro do servidor
+        ~ "getMyIp.c"    // possui a função que identifica o Ip de rede para 
+facilitar na conexão externa
+        ~ "header.h"     // apresenta a lista de funções globais do sistema 
+(funções de um arquivo que são chamadas por funções de outros)
+        ~ "pastasClientes" (pasta)  // pasta base, impossível rodar o servidor 
+sem ela, possui todas as pastas dos clientes cadastrados e o arquivo de 
+gerenciamento de cadastros
+            ~ "clientesCadastrados.txt"    // arquivo de gerenciamento de 
+cadastros, contém todos os usuários cadastrados e suas senhas.
+            
+    - Atualmente, por um bug na senha, o servidor pede para o cliente a senha, 
+porém não executa a verificação, liberando o login mesmo que a senha esteja 
+inválida. (v6.34)
+    
+    - O servidor só estará recebendo conexões se aparecer a mensagem "SERVIDOR 
+ONLINE", caso contrário, ocorreu algum erro e ele estará fechado para conexões.
+    
+    - Alguns erros internos do servidor irão parar em uma função chamada 
+"loopErro" que fará com que o servidor continue recebendo conexões e respondendo 
+que está impossibilitado para receber clientes. É extremamente raro parar nessa 
+função, já que ela só é chamada por um valor interno do servidor que foi 
+atribuído indevidamente (até hoje, fora quando for forçado a ir para ela, 
+nenhuma vez o servidor ficou dessa forma). Porém esse mecanismo existe e mantém 
+o servidor online, mesmo com um erro gravíssimo, só que impossibilitado de fazer 
+qualquer coisa.
