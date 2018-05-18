@@ -113,7 +113,11 @@ int opLs(int cliente, int port, char ipCliente[], int passiveMode){
     char *arquivo;
     FILE *arq;
 
-    dataCon = iniciarConexaoDados(cliente, port, ipCliente);
+    if(passiveMode == 0)
+        dataCon = iniciarConexaoDados(cliente, port, ipCliente);
+    else
+        dataCon = conexaoModoPassivo(cliente, port);
+
     if(dataCon == 0){
         return 0;
     }else{
@@ -271,7 +275,10 @@ int opPut(int cliente, char nomeArquivo[], char ipCliente[], int port, int passi
     char temp[100];
     struct vetChar *vet;
     int tamArq;
-    dataCon = iniciarConexaoDados(cliente, port, ipCliente);
+    if(passiveMode == 0)
+        dataCon = iniciarConexaoDados(cliente, port, ipCliente);
+    else
+        dataCon = conexaoModoPassivo(cliente, port);
 
     if(dataCon == 0){
         printf("ERRO ao abrir conexao de dados, PUT finalizado\n");
@@ -308,7 +315,7 @@ int opPut(int cliente, char nomeArquivo[], char ipCliente[], int port, int passi
     i=1;
     while(1){
         n = read(dataCon, vet[i-1].byte, 8);
-        printf("Leu: %s\n", vet[i-1].byte);
+        //printf("Leu: %s\n", vet[i-1].byte);
         if(n <= 0 || n == -1)
             break;
         i++;
