@@ -191,4 +191,18 @@
             * O envio do arquivo foi bem sucedido, o arquivo foi montado com sucesso e permaneceu com o mesmo tamanho do arquivo inicial enviado.
             * Porém, utilizando o comando "diff", percebeu-se que os arquivos eram diferentes.
             * Abrindo o conteúdo do arquivo que chegou na pasta do cliente, não foi possível ler o que foi enviado.
-    
+
+7.0
+        - Threads implementadas!
+            * PROBLEMA: para criar as threads, foi usada uma gambiarra que, cada cliente que conectar, vai iniciar uma threads. Para iniciar uma threads, sera aumentada em uma posição o vetor de pthread_t, que rege as threads em C, então, supondo que um milhão de clientes conectem, existirá um limite de memória para alocar o vetor. O vetor não é zerado quando o cliente disconnecta.
+            * POSSIVEL SOLUÇÃO:
+                    ~ deixar um número fixo de clientes que possam ficar onlines
+                    ~ gerenciar uma tabela de clientes online e o número da thread dele para ver quais threads estão sendo usadas
+                    ~ matar a thread do cliente assim que ele desconectar;
+            ******* PROBLEMA GRAVE:
+                ~ sempre que uma thread é criada e um cliente loga, a thread cria uma pasta para o cliente na pasta em que está a outra
+                    ^ex: Cliente 'tulio' logou e, após, o cliente 'dudi', é criada uma 'pasta_dudi' dentro da 'pasta_tulio'
+                    ^ isso diz que o programa inteiro só pode rodar em cima de uma pasta
+                ~ POSSÍVEL SOLUÇÃO: utilizar a pasta de fora (permanecer na pasta raiz e executar tudo oq for preciso pela pasta raiz)
+                    ^ pra isso, vai ser preciso uma string que mostre o caminho, a qual será concatenada em caso de CWD e apagada a última pasta em caso de CDUP
+                    ^ problema: quando for entrar a pasta, a pasta deve apenas se anexada (tentar entrar e depois retornar a pasta raiz e anexar ela ali)

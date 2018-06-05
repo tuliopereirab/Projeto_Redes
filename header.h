@@ -9,17 +9,17 @@
 
 // LOGIN.C
 int carregarClientes();
-int finalizarSessao(int idCliente);
+void finalizarSessao(int idCliente);
 int logar(char nome[], char senha[]);
 int pegarIdCliente(char nome[]);
 //--------------------------
 // SERVER.C
-int opUser(int cliente);
+int opUser(int cliente, char usernameCliente[]);
 void loopErro();
 //--------------------------
 // FUNC.C
 int opLs(int cliente, int port, char ipCliente[], int passiveMode);
-void opQuit(int cliente, int idCliente);
+void opQuit(int cliente, int idCliente, char ipCliente[]);
 int opCwd(int cliente, char pasta[]);
 int opCwdPonto(int cliente);
 int opPut(int cliente, char nomeArquivo[], char ipCliente[], int port, int passiveMode);

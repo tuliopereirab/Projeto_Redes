@@ -5,7 +5,7 @@
 #include<netdb.h>
 #include<ifaddrs.h>
 #include<stdlib.h>
-#include<unistd.h>
+//#include<unistd.h>
 
 char* getMyIp()  // COPIADA EXATAMENTE DA INTERNET, LINK NO ARQUIVO DE LINKS
 {

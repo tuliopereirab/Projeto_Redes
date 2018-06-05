@@ -106,7 +106,7 @@ int cadastrar(char nome[], char senha[]){
     return 2; // 2 - cliente cadastrado com sucesso
 }
 
-int finalizarSessao(int idCliente){
+void finalizarSessao(int idCliente){
     listaClientes[idCliente].status = 0;
     printf("Cliente \'%s\' agora está offline\n", listaClientes[idCliente].nome);
     return 1;

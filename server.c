@@ -10,13 +10,19 @@
 #include <sys/sendfile.h>
 #include <fcntl.h>
 
+#include <pthread.h>
 
 #define PORTA 8080
 #define MAXBUF 100
 
 int entrarPasta(int nomePasta[]);
-void conversa(int cliente);
+void conversa(int cliente, int idCliente, char ipCliente[], int passiveMode, int statusLogin);
 int finalizarConexao();
+
+struct argumentos{
+    int cliente, idCliente, passiveMode, statusLogin;
+    char ipCliente[INET_ADDRSTRLEN];
+};
 
 // ------------------
 // EXTERNAS
@@ -24,7 +30,7 @@ int carregarClientes();
 int logar(char nome[], char senha[]);
 void finalizarSessao();
 int opLs(int cliente, int port, char ipCliente[], int passiveMode);
-void opQuit(int cliente, int idCliente);
+void opQuit(int cliente, int idCliente, char ipCliente[]);
 int opCwd(int cliente, char pasta[]);
 int opCwdPonto(int cliente);
 int opPut(int cliente, char nomeArquivo[], char ipCliente[], int port, int passiveMode);
@@ -40,15 +46,16 @@ char* getMyIp();
 // INTERNAS
 void encontrarComando(char msg[]);
 void encontrarParametro(char msg[]);
-int opUser(int cliente);
+int opUser(int cliente, char usernameCliente[]);
 int entraPasta(char nomePasta[]);
 int finalizarConexao();
 void loopErro();
+void *inicioThread(void *argumentos);
 //-------------------
 
-int idCliente;
+
 int pasta;
-int statusLogin=0;
+
 int statusServidor = 0;
 char parametro[20];
 char comando[5];
@@ -56,11 +63,18 @@ int port = PORTA+1; // PORT = PORTA DADOS; PORTA = PORTA CONTROLE
 int s;
 struct sockaddr_in client;
 int addrlen;
-char ipCliente[INET_ADDRSTRLEN];
 char *myIp = NULL;
-int passiveMode = 0;
 
 int main(){
+    pthread_t *t=NULL;
+    int nThreadsOn=1;
+    struct argumentos args;
+    //----------------------
+    int idCliente;
+    char ipCliente[INET_ADDRSTRLEN];
+    int passiveMode = 0;
+    //int statusLogin=0;
+    //----------------------
     char nomeCliente[20], nomePasta[50];
     int s, client_s;
     struct sockaddr_in self;
@@ -111,23 +125,47 @@ int main(){
         //--------------------
         printf("Ip Cliente: %s\n", ipCliente);
         printf("Conexão solicitada\n");
-        strcpy(msgEnviar, "220 Servico pronto\n");
-        write(client_s, msgEnviar, strlen(msgEnviar)+1);
-        conversa(client_s);
-        close(client_s);
-        printf("Conexao finalizada\n");
-        printf("--------------------------------------------------------------\n");
+        args.idCliente = idCliente;
+        args.cliente = client_s;
+        args.passiveMode = passiveMode;
+        args.statusLogin = statusLogin;
+        strcpy(args.ipCliente, ipCliente);
+        if(t == NULL)
+            t = malloc(sizeof(pthread_t));
+        else
+            t = realloc(t, sizeof(pthread_t)*nThreadsOn);
+        if((pthread_create(&t[nThreadsOn-1], NULL, inicioThread, (void *)&args) == 0)){
+            nThreadsOn++;
+        }else{
+            printf("Erro ao criar threads!\n");
+            loopErro();
+        }
+        //strcpy(msgEnviar, "220 Servico pronto\n");
+        //write(client_s, msgEnviar, strlen(msgEnviar)+1);
+        //conversa(client_s);
+        //close(client_s);
+        //printf("Conexao finalizada\n");
+        //printf("--------------------------------------------------------------\n");
     }
 }
 
+void *inicioThread(void *argumentos){
+    struct argumentos *args = argumentos;
+    char msgEnvia[100];
+    strcpy(msgEnvia, "220 Servico pronto\n");
+    write(args->cliente, msgEnvia, strlen(msgEnvia));
+    printf("THREAD criando thread para cliente IP %s\n", args->ipCliente);
+    conversa(args->cliente, args->idCliente, args->ipCliente, args->passiveMode, args->statusLogin);
+}
 
 
-void conversa(int cliente){
+void conversa(int cliente, int idCliente, char ipCliente[], int passiveMode, int statusLogin){
     int op = 88;
     int status;
     int i, j;
     char msgRecebe[100], msgEnvia[100];
     int codigoEnvia;
+    char usernameCliente[20];
 
 
     do{
@@ -220,9 +258,15 @@ void conversa(int cliente){
                 status = opDele(cliente, parametro);
                 break;
             case 40:
-                statusLogin = opUser(cliente);
+                strcpy(usernameCliente, parametro);
+                statusLogin = opUser(cliente, usernameCliente);
                 if((statusLogin == 99) || (statusLogin == 0))
                     op = 99;
+                else{
+                    idCliente = pegarIdCliente(usernameCliente);
+                    printf("Parametro: %s\nID: %i\n", usernameCliente, idCliente);
+                    printf("ID cliente: %i\n", idCliente);
+                }
                 break;
             case 41:
                 printf("SYST solicitado\n");
@@ -254,7 +298,7 @@ void conversa(int cliente){
                 printf("QUIT solicitado pelo cliente\n\n");
                 statusLogin = 0;
                 passiveMode = 0;
-                opQuit(cliente, idCliente);
+                opQuit(cliente, idCliente, ipCliente);
                 break;
             case 0:
                 printf("ERRO, comando digitado invalido\n\n");
@@ -266,16 +310,18 @@ void conversa(int cliente){
 
         }
     }while(op != 99);
+    system(EXIT_SUCCESS);
 }
 
-int opUser(int cliente){
+int opUser(int cliente, char usernameCliente[]){
     char msgEnvia[100], msgRecebe[100];
     char senhaCliente[20];
     char nomePasta[50];
-    char usernameCliente[20];
+    //char usernameCliente[20];
     int status, i;
+    int statusLogin;
 
-    strcpy(usernameCliente, parametro);
+    //strcpy(usernameCliente, parametro);
     printf("Cliente \'%s\' tentando login\n", usernameCliente);
 
     strcpy(msgEnvia, "331 aguardando senha\n");
@@ -300,10 +346,10 @@ int opUser(int cliente){
     if(status == 0)
         statusLogin = logar(usernameCliente, senhaCliente);
 
-    if((statusLogin == 1) || (statusLogin == 2)){
+    /*if((statusLogin == 1) || (statusLogin == 2)){
         idCliente = pegarIdCliente(usernameCliente);
         printf("ID cliente: %i\n", idCliente);
-    }
+    }*/
 
     if(statusLogin == 1){
         status = 0;
@@ -367,6 +413,7 @@ int opUser(int cliente){
             strcpy(msgEnvia, "501 cliente ja esta logado\n");
             write(cliente, msgEnvia, strlen(msgEnvia)+1);
             printf("Cliente \'%s\' já está logado\n", usernameCliente);
+            return 0;
         }else{
             strcpy(msgEnvia, "421 erro desconhecido\n");
             write(cliente, msgEnvia, strlen(msgEnvia)+1);

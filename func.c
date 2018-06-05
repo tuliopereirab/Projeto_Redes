@@ -18,16 +18,17 @@ struct vetChar{
 int iniciarConexaoDados(int cliente, int port, char ipCliente[]);
 int calcPort(int val1, int val2);
 int calcPortPASV(int val, int set);
-int finalizarSessao(int idCliente);
+void finalizarSessao(int idCliente);
 void loopErro();
 char* readFileBytes(const char *name);
 char* correcaoPort(char aux[]);
 int conexaoModoPassivo(int cliente, int port);
 
 
-void opQuit(int cliente, int idCliente){
+void opQuit(int cliente, int idCliente, char ipCliente[]){
     int statusFinalizar;
     char msgEnvia[100];
+    printf("QUIT cliente ID %i finalizando conexão\n");
     strcpy(msgEnvia, "221 Finalizando conexao\n");
     write(cliente, msgEnvia, strlen(msgEnvia)+1);
     finalizarSessao(idCliente);
@@ -39,7 +40,10 @@ void opQuit(int cliente, int idCliente){
     }else{
         printf("Servidor retornado para pasta raiz\n");
     }
-    printf("Finalizando conexao: pedido cliente\n");
+    printf("Finalizando conexao: pedido cliente IP %s\n", ipCliente);
+    close(cliente);
+    printf("Conexao finalizada\n");
+    printf("--------------------------------------------------------------\n");
 }
 
 int opPort(char portas[]){
