@@ -215,3 +215,7 @@
                 4. Quando a thread acabar, ela, antes de finalizar, colocará na posição de sua thread (passada por parâmetro) o valor zero, indicando que acabou de utilizar;
                 5. Quando outra thread for iniciar, será verificado se ainda existe alguma posição vazia, caso contrário, será criada uma nova thread.
                 6. sendo assim, é possível sempre reutilizar todas as posições do vetor pthread_t
+
+7.2     - Problema de endereços corrigido
+            - Criado um sistema que guarda o endereço atual em cada thread e utiliza ele para gerenciar arquivos.
+            - Todas as funções utilizam esse endereço

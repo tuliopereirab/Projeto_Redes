@@ -6,6 +6,7 @@
 #include "porta.c"
 #include "apoio.c"
 #include "getMyIp.c"
+#include "pastas.c"
 
 // LOGIN.C
 int carregarClientes();
@@ -20,11 +21,11 @@ void loopErro();
 // FUNC.C
 int opLs(int cliente, int port, char ipCliente[], int passiveMode);
 void opQuit(int cliente, int idCliente, char ipCliente[]);
-int opCwd(int cliente, char pasta[]);
-int opCwdPonto(int cliente);
+int opCwd(int cliente, int status, char pasta[]);
+char* opCwdPonto(int cliente, char pasta[]);
 int opPut(int cliente, char nomeArquivo[], char ipCliente[], int port, int passiveMode);
 int opGet(int cliente, char ipCliente[], int port, char nomeArquivo[], int passiveMode);
-int opPwd(int cliente);
+int opPwd(int cliente, char endereco[]);
 int opRmd(int cliente, char pasta[]);
 int opMkd(int cliente, char pasta[]);
 int opDele(int cliente, char arquivo[]);
@@ -45,3 +46,12 @@ int buscarThread(int controle[], int nThreads);
 //--------------------------
 // GETMYIP.C
 char* getMyIp();
+//--------------------------
+// PASTAS.C
+int vPasta(char pasta[]);
+int cPasta(char pasta[], char nome[], int op);
+int ePasta(char pasta[]);
+int sairPasta(char pasta[]);
+char* rPasta(char pasta[]);
+char* aPasta(char pasta[], char newPasta[]);
+int contarPastas(char pasta[]);

@@ -23,7 +23,13 @@ void loopErro();
 char* readFileBytes(const char *name);
 char* correcaoPort(char aux[]);
 int conexaoModoPassivo(int cliente, int port);
-
+int vPasta(char pasta[]);
+int cPasta(char pasta[], char nome[], int op);
+int ePasta(char pasta[]);
+int sairPasta(char pasta[]);
+char* rPasta(char pasta[]);
+char* aPasta(char pasta[], char newPasta[]);
+int contarPastas(char pasta[]);
 
 void opQuit(int cliente, int idCliente, char ipCliente[]){
     int statusFinalizar;
@@ -32,14 +38,14 @@ void opQuit(int cliente, int idCliente, char ipCliente[]){
     strcpy(msgEnvia, "221 Finalizando conexao\n");
     write(cliente, msgEnvia, strlen(msgEnvia)+1);
     finalizarSessao(idCliente);
-    statusFinalizar = finalizarConexao();
+    /*statusFinalizar = finalizarConexao();
     if(statusFinalizar != 0){
         printf("Erro ao finalizar conexão: pasta raiz não pode ser retornada\nFINALIZANDO SERVIDOR!\n");
         close(cliente);
         loopErro();
-    }else{
+    }else{*/
         printf("Servidor retornado para pasta raiz\n");
-    }
+    //}
     printf("Finalizando conexao: pedido cliente IP %s\n", ipCliente);
     close(cliente);
     printf("Conexao finalizada\n");
@@ -232,11 +238,9 @@ int opPasv(int cliente, int porta, char ipCliente[]){
 }
 
 
-int opCwd(int cliente, char pasta[]){
-    int status;
+int opCwd(int cliente, int status, char pasta[]){
     char msgEnvia[100];
     printf("CWD solicitado\n");
-    status = chdir(pasta);
     if(status == 0){
         strcpy(msgEnvia, "250 diretorio acessado com sucesso\n");
         write(cliente, msgEnvia, strlen(msgEnvia)+1);
@@ -250,22 +254,22 @@ int opCwd(int cliente, char pasta[]){
     }
 }
 
-int opCwdPonto(int cliente){
+char* opCwdPonto(int cliente, char pasta[]){
     char msgEnvia[100];
     int status;
+    char *new;
     printf("CDUP solicitado\n");
-    status = chdir("..");
-    if(status == 0){
-        strcpy(msgEnvia, "200 diretorio alterado\n");
-        write(cliente, msgEnvia, strlen(msgEnvia)+1);
-        printf("CDUP diretório anterior acessado\n");
-        return 1;
-    }else{
+    new = rPasta(pasta);
+    strcpy(msgEnvia, "200 diretorio alterado\n");
+    write(cliente, msgEnvia, strlen(msgEnvia)+1);
+    printf("CDUP diretório anterior acessado\n");
+    return new;
+    /*}else{
         strcpy(msgEnvia, "550 erro ao acessar diretorio\n");
         write(cliente, msgEnvia, strlen(msgEnvia)+1);
         printf("CDUP erro ao acessar diretório anterior\n");
-        return 0;
-    }
+        return '\0';
+    }*/
 }
 
 int opPut(int cliente, char nomeArquivo[], char ipCliente[], int port, int passiveMode){
@@ -409,25 +413,16 @@ int opGet(int cliente, char ipCliente[], int port, char nomeArquivo[], int passi
 
 
 
-int opPwd(int cliente){
+int opPwd(int cliente, char endereco[]){
     printf("PWD solicitado\n");
     int i;
-    char endereco[100];
+    //char endereco[100];
     char msgEnvia[100];
-    int arquivo;
-    FILE *arq;
 
-    system("pwd >temp.txt");
-
-    arq = fopen("temp.txt", "r");
-    i = 0;
-    while((endereco[i] = fgetc(arq)) != EOF)
-        i++;
-    endereco[i] = NULL;
-    fclose(arq);
 
     strcpy(msgEnvia, "257 ");
     strcat(msgEnvia, endereco);
+    strcat(msgEnvia, "\n");
     write(cliente, msgEnvia, strlen(msgEnvia)+1);
 
     printf("PWD enviado\n");

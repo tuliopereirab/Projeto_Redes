@@ -33,11 +33,11 @@ int logar(char nome[], char senha[]);
 void finalizarSessao();
 int opLs(int cliente, int port, char ipCliente[], int passiveMode);
 void opQuit(int cliente, int idCliente, char ipCliente[]);
-int opCwd(int cliente, char pasta[]);
-int opCwdPonto(int cliente);
+int opCwd(int cliente, int status, char pasta[]);
+char* opCwdPonto(int cliente, char pasta[]);
 int opPut(int cliente, char nomeArquivo[], char ipCliente[], int port, int passiveMode);
 int opGet(int cliente, char ipCliente[], int port, char nomeArquivo[], int passiveMode);
-int opPwd(int cliente);
+int opPwd(int cliente, char endereco[]);
 int opRmd(int cliente, char pasta[]);
 int opMkd(int cliente, char pasta[]);
 int opDele(int cliente, char arquivo[]);
@@ -45,6 +45,13 @@ int opPort(char portas[]);
 void finalizarSessao(int idCliente);
 char* getMyIp();
 int buscarThread(int controle[], int nThreads);
+int vPasta(char pasta[]);
+int cPasta(char pasta[], char nome[], int op);
+int ePasta(char pasta[]);
+int sairPasta(char pasta[]);
+char* rPasta(char pasta[]);
+char* aPasta(char pasta[], char newPasta[]);
+int contarPastas(char pasta[]);
 //-------------------
 // INTERNAS
 void encontrarComando(char msg[]);
@@ -57,7 +64,7 @@ void *inicioThread(void *argumentos);
 //-------------------
 
 
-int pasta;
+
 int *controleThread=NULL;        // verificar commit versão 7.1
 int statusServidor = 0;
 char parametro[20];
@@ -175,7 +182,6 @@ void *inicioThread(void *argumentos){
     controleThread[args->posicaoControle] = 0;
 }
 
-
 void conversa(int cliente, int idCliente, char ipCliente[], int passiveMode, int statusLogin){
     int op = 88;
     int status;
@@ -183,9 +189,15 @@ void conversa(int cliente, int idCliente, char ipCliente[], int passiveMode, int
     char msgRecebe[100], msgEnvia[100];
     int codigoEnvia;
     char usernameCliente[20];
-    
+    char pastaAtual[100], pasta1[150];
+    char* auxPasta;
+    int pasta=0;
+    strcpy(pastaAtual, "");
+    pastaAtual[0] = '\0';
 
     do{
+        system("pwd");
+        printf("------------------\n");
         for(i=0;i<100; i++)
             msgRecebe[i] = NULL;
         read(cliente, msgRecebe, MAXBUF);
@@ -241,15 +253,27 @@ void conversa(int cliente, int idCliente, char ipCliente[], int passiveMode, int
                 status = opLs(cliente, port, ipCliente, passiveMode);
                 break;
             case 4:
-                status = opCwd(cliente, parametro);
+                /*pasta = opCwd(cliente, parametro);
                 if(status == 1)
                     pasta++;
+                */
+                auxPasta = aPasta(pastaAtual, parametro);
+                //printf("AuxAtual: %s\n", auxPasta);
+                status = vPasta(auxPasta);
+                //system("pwd");
+                //printf("Status: %i\n", status);
+                if(status == 0){
+                    pasta++;
+                    strcpy(pastaAtual, auxPasta);
+                }
+                status = opCwd(cliente, status, parametro);
                 break;
             case 5:
                 printf("Pasta 1: %i\n", pasta);
                 if(pasta > 0){
                     pasta--;
-                    status = opCwdPonto(cliente);
+                    auxPasta = opCwdPonto(cliente, pastaAtual);
+                    strcpy(pastaAtual, auxPasta);
                 }else{
                     strcpy(msgEnvia, "550 Ja esta na pasta raiz do usuario\n");
                     write(cliente, msgEnvia, strlen(msgEnvia)+1);
@@ -257,22 +281,27 @@ void conversa(int cliente, int idCliente, char ipCliente[], int passiveMode, int
                 }
                 break;
             case 6:
-                status = opPwd(cliente);
+                status = opPwd(cliente, pastaAtual);
                 break;
             case 10:
+                auxPasta = aPasta(pastaAtual, auxPasta);
                 status = opPut(cliente, parametro, ipCliente, port, passiveMode);
                 break;
             case 11:
-                status = opGet(cliente, ipCliente, port, parametro, passiveMode);
+                auxPasta = aPasta(pastaAtual, parametro);
+                status = opGet(cliente, ipCliente, port, auxPasta, passiveMode);
                 break;
             case 20:
-                status = opRmd(cliente, parametro);
+                auxPasta = aPasta(pastaAtual, parametro);
+                status = opRmd(cliente, auxPasta);
                 break;
             case 21:
-                status = opMkd(cliente, parametro);
+                auxPasta = aPasta(pastaAtual, parametro);
+                status = opMkd(cliente, auxPasta);
                 break;
             case 30:
-                status = opDele(cliente, parametro);
+                auxPasta = aPasta(pastaAtual, parametro);
+                status = opDele(cliente, auxPasta);
                 break;
             case 40:
                 strcpy(usernameCliente, parametro);
@@ -283,6 +312,11 @@ void conversa(int cliente, int idCliente, char ipCliente[], int passiveMode, int
                     idCliente = pegarIdCliente(usernameCliente);
                     printf("Parametro: %s\nID: %i\n", usernameCliente, idCliente);
                     printf("ID cliente: %i\n", idCliente);
+                    strcpy(pasta1, "pasta_");
+                    strcat(pasta1, usernameCliente);
+                    strcpy(pastaAtual, pasta1);
+                    //vPasta(pastaAtual);
+                    pasta=0;
                 }
                 break;
             case 41:
@@ -397,7 +431,6 @@ int opUser(int cliente, char usernameCliente[]){
 
 
     if(status == 1){
-        pasta = 0;
         if(statusLogin == 1){
             strcpy(msgEnvia, "230 Usuario logado com sucesso\n");
             write(cliente, msgEnvia, strlen(msgEnvia)+1);
@@ -483,16 +516,16 @@ void encontrarParametro(char msg[]){
 }
 
 int entraPasta(char nomePasta[]){
-    if(chdir(nomePasta) != 0){
-        if(mkdir(nomePasta, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH | S_IWOTH) != 0){
-            printf("Erro ao criar pasta!\n");
-            return 10;
-        }else if(chdir(nomePasta) != 0)
-            return 20;
-    }else
-        return 1;
+    int status;
+    status = vPasta(nomePasta);
+    if(status == 0)
+        return status;
+    else{
+        status = cPasta("", nomePasta, 0);
+        return status;
+    }
 }
-
+/*
 int finalizarConexao(){
     int i;
     int status=0;
@@ -508,9 +541,8 @@ int finalizarConexao(){
         else
             return status;
     }
-
 }
-
+*/
 void loopErro(){
     char msgEnvia[100];
     int cliente;
