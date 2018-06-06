@@ -3,7 +3,7 @@
 Comandos FTP:
 
 0 - Erro - Opção que vai para a função de erro e evita que o sistema trave (FUNCIONAL)
-1 - LIST - listagem simples de arquivos (NÃO FUNCIONAL - olhar comentário de upload 6.33)
+1 - LIST - listagem simples de arquivos (FUNCIONAL - olhar comentário de upload 7.3)
 2 - dir - listagem com informações mais completas sobre os arquivo (tamanho em bytes, data de alteração e nome do arquivo) (NÃO SERÁ IMPLEMENTADA)
 3 - ls -la - igual ao dir mas lista tbm arquivos ocultos (NÃO SERÁ IMPLEMENTADO)
 4 - CWD [nome do diretorio] - acessar um diretorio  (FUNCIONAL)

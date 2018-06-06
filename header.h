@@ -19,7 +19,7 @@ int opUser(int cliente, char usernameCliente[]);
 void loopErro();
 //--------------------------
 // FUNC.C
-int opLs(int cliente, int port, char ipCliente[], int passiveMode);
+int opLs(int cliente, int port, char ipCliente[], int passiveMode, char pasta[]);
 void opQuit(int cliente, int idCliente, char ipCliente[]);
 int opCwd(int cliente, int status, char pasta[]);
 char* opCwdPonto(int cliente, char pasta[]);

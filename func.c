@@ -9,6 +9,8 @@
 #include <sys/ioctl.h>
 #include <fcntl.h>
 
+#include <dirent.h>
+
 struct vetChar{
     char byte[8];
 };
@@ -112,15 +114,18 @@ int opPort(char portas[]){
     return port;
 }
 
-int opLs(int cliente, int port, char ipCliente[], int passiveMode){
+int opLs(int cliente, int port, char ipCliente[], int passiveMode, char pasta[]){
     printf("LIST solicitado\n");
-
+    DIR *dir;
+    struct dirent *lsdir;
+    dir = opendir(pasta);
     struct stat obj;
     int dataCon;
     int tamanho, i;
     //int arquivo;
     char msgEnvia[100];
     char *arquivo;
+    char *enviar = (char*)malloc(sizeof(char)*1000);
     FILE *arq;
 
     if(passiveMode == 0)
@@ -131,7 +136,7 @@ int opLs(int cliente, int port, char ipCliente[], int passiveMode){
     if(dataCon == 0){
         return 0;
     }else{
-        system("ls >temp.txt");
+        /*system("ls >temp.txt");
         system("iconv temp.txt --to-code ASCII >temp2.txt");
         stat("temp2.txt", &obj);
         tamanho = obj.st_size;
@@ -143,6 +148,15 @@ int opLs(int cliente, int port, char ipCliente[], int passiveMode){
         }
         //sendfile(dataCon, arquivo, NULL, tamanho);
         //write(dataCon, arquivo, tamanho);
+        */
+        while ((lsdir = readdir(dir)) != NULL){
+            strcat(enviar, lsdir->d_name);
+            strcat(enviar, "  ||  ");
+        }
+        closedir(dir);
+        //printf("ListaPasta: %s\n", enviar);
+        write(dataCon, enviar, strlen(enviar)+1);
+        free(enviar);
         close(dataCon);
         strcpy(msgEnvia, "250 Arquivo enviado\n");
         write(cliente, msgEnvia, strlen(msgEnvia)+1);
