@@ -194,7 +194,8 @@ void conversa(int cliente, int idCliente, char ipCliente[], int passiveMode, int
     int pasta=0;
     strcpy(pastaAtual, "");
     pastaAtual[0] = '\0';
-
+    printf("ipCliente: %s\n", ipCliente);
+    printf("----------__");
     do{
         //system("pwd");
         //printf("------------------\n");
