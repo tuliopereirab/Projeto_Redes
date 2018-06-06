@@ -197,6 +197,9 @@ void conversa(int cliente, int idCliente, char ipCliente[], int passiveMode, int
     printf("ipCliente: %s\n", ipCliente);
     printf("----------__");
     do{
+        printf("ipCliente: %s\n", ipCliente);
+        printf("----------__");
+    
         //system("pwd");
         //printf("------------------\n");
         for(i=0;i<100; i++)
