@@ -25,3 +25,11 @@ char* correcaoPort(char aux[]){
         }
     return aux;
 }
+
+int buscarThread(int controle[], int nThreads){
+    int i;
+    for(i=0; i<nThreads; i++)
+        if(controle[i] == 0)
+            return i;
+    return -1;
+}

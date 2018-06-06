@@ -206,3 +206,12 @@
                 ~ POSSÍVEL SOLUÇÃO: utilizar a pasta de fora (permanecer na pasta raiz e executar tudo oq for preciso pela pasta raiz)
                     ^ pra isso, vai ser preciso uma string que mostre o caminho, a qual será concatenada em caso de CWD e apagada a última pasta em caso de CDUP
                     ^ problema: quando for entrar a pasta, a pasta deve apenas se anexada (tentar entrar e depois retornar a pasta raiz e anexar ela ali)
+
+7.1     - Controle de Threads:
+            * Foi adicionado um ponteiro global inteiro que mostra as posições de threads, funcionando assim:
+                1. Ponteiro iniciado em NULL
+                2. Cria uma thread (alocando a thread - realloc()) e também realoca o ponteiro de controle (pthread_t e controle terão o mesmo tamanho);
+                3. Será colocado, na última posição do vetor, o valor 1, indicando que a thread está sendo utilizada.
+                4. Quando a thread acabar, ela, antes de finalizar, colocará na posição de sua thread (passada por parâmetro) o valor zero, indicando que acabou de utilizar;
+                5. Quando outra thread for iniciar, será verificado se ainda existe alguma posição vazia, caso contrário, será criada uma nova thread.
+                6. sendo assim, é possível sempre reutilizar todas as posições do vetor pthread_t

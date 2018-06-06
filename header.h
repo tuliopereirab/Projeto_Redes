@@ -41,6 +41,7 @@ int calcPortPASV(int val, int set);
 // APOIO.c
 char* readFileBytes(const char *name);
 char* correcaoPort(char aux[]);
+int buscarThread(int controle[], int nThreads);
 //--------------------------
 // GETMYIP.C
 char* getMyIp();

@@ -22,7 +22,9 @@ int finalizarConexao();
 struct argumentos{
     int cliente, idCliente, passiveMode, statusLogin;
     char ipCliente[INET_ADDRSTRLEN];
+    int posicaoControle;
 };
+
 
 // ------------------
 // EXTERNAS
@@ -42,6 +44,7 @@ int opDele(int cliente, char arquivo[]);
 int opPort(char portas[]);
 void finalizarSessao(int idCliente);
 char* getMyIp();
+int buscarThread(int controle[], int nThreads);
 //-------------------
 // INTERNAS
 void encontrarComando(char msg[]);
@@ -55,7 +58,7 @@ void *inicioThread(void *argumentos);
 
 
 int pasta;
-
+int *controleThread=NULL;        // verificar commit versão 7.1
 int statusServidor = 0;
 char parametro[20];
 char comando[5];
@@ -85,6 +88,7 @@ int main(){
     int statusClientes, statusLogin;
     char senhaCliente[15], usernameCliente[15];
     int statusFinalizar, statusPastaRaiz;
+    int nThreadCriadas=1, threadDisp;
 
 
     statusPastaRaiz = chdir("pastasClientes");
@@ -130,11 +134,23 @@ int main(){
         args.passiveMode = passiveMode;
         args.statusLogin = statusLogin;
         strcpy(args.ipCliente, ipCliente);
-        if(t == NULL)
+        if(t == NULL){
             t = malloc(sizeof(pthread_t));
-        else
-            t = realloc(t, sizeof(pthread_t)*nThreadsOn);
-        if((pthread_create(&t[nThreadsOn-1], NULL, inicioThread, (void *)&args) == 0)){
+            controleThread = malloc(sizeof(int));
+            threadDisp=0;
+        }
+        else{
+            threadDisp = buscarThread(controleThread, nThreadCriadas);
+            if(threadDisp == -1){
+                t = realloc(t, sizeof(pthread_t)*nThreadsOn);
+                controleThread = realloc(controleThread, sizeof(int)*nThreadCriadas+1);
+                threadDisp = nThreadCriadas;
+                nThreadCriadas++;
+            }
+        }
+        args.posicaoControle = threadDisp;
+        if((pthread_create(&t[threadDisp], NULL, inicioThread, (void *)&args) == 0)){
+            controleThread[threadDisp] = 1;
             nThreadsOn++;
         }else{
             printf("Erro ao criar threads!\n");
@@ -156,6 +172,7 @@ void *inicioThread(void *argumentos){
     write(args->cliente, msgEnvia, strlen(msgEnvia));
     printf("THREAD criando thread para cliente IP %s\n", args->ipCliente);
     conversa(args->cliente, args->idCliente, args->ipCliente, args->passiveMode, args->statusLogin);
+    controleThread[args->posicaoControle] = 0;
 }
 
 
@@ -166,7 +183,7 @@ void conversa(int cliente, int idCliente, char ipCliente[], int passiveMode, int
     char msgRecebe[100], msgEnvia[100];
     int codigoEnvia;
     char usernameCliente[20];
-
+    
 
     do{
         for(i=0;i<100; i++)
