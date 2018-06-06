@@ -222,3 +222,9 @@
 
 7.2.1
         - Alguns problemas leves corrigidos;
+
+7.2.1.3
+    ********* APOIO.C MODIFICADO E COM MAIN, NÃO COMPILAR
+        - problema no IP: o IP do último cliente fica como se fosse o IP de todos os clientes
+            ~ tentativa de solução: passar o IP por meio de 4 valores int e depois remontar
+            ~ no apoio.c, o IP foi quebrado em 4 valores, porém é considerado que cada um dos valores tenha 3 caracteres, então sempre é adicionado um terceiro, mesmo que não tenha.

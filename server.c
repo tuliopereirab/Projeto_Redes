@@ -175,6 +175,7 @@ int main(){
 void *inicioThread(void *argumentos){
     struct argumentos *args = argumentos;
     char msgEnvia[100];
+
     strcpy(msgEnvia, "220 Servico pronto\n");
     write(args->cliente, msgEnvia, strlen(msgEnvia));
     printf("THREAD criando thread para cliente IP %s\n", args->ipCliente);
@@ -194,12 +195,10 @@ void conversa(int cliente, int idCliente, char ipCliente[], int passiveMode, int
     int pasta=0;
     strcpy(pastaAtual, "");
     pastaAtual[0] = '\0';
-    printf("ipCliente: %s\n", ipCliente);
-    printf("----------__");
     do{
         printf("ipCliente: %s\n", ipCliente);
-        printf("----------__");
-    
+        printf("------------");
+
         //system("pwd");
         //printf("------------------\n");
         for(i=0;i<100; i++)
