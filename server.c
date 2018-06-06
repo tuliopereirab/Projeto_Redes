@@ -196,8 +196,8 @@ void conversa(int cliente, int idCliente, char ipCliente[], int passiveMode, int
     pastaAtual[0] = '\0';
 
     do{
-        system("pwd");
-        printf("------------------\n");
+        //system("pwd");
+        //printf("------------------\n");
         for(i=0;i<100; i++)
             msgRecebe[i] = NULL;
         read(cliente, msgRecebe, MAXBUF);
@@ -223,7 +223,8 @@ void conversa(int cliente, int idCliente, char ipCliente[], int passiveMode, int
                 else if((strcmp(comando, "PWD")) == 0)
                     op = 6;
                 else if((strcmp(comando, "STOR")) == 0)
-                    op = 10;
+                    op = 0;
+                    //op = 10;
                 else if((strcmp(comando, "RETR")) == 0)
                     op = 11;
                 else if((strcmp(comando, "RMD")) == 0)

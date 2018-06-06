@@ -219,3 +219,6 @@
 7.2     - Problema de endereços corrigido
             - Criado um sistema que guarda o endereço atual em cada thread e utiliza ele para gerenciar arquivos.
             - Todas as funções utilizam esse endereço
+
+7.2.1
+        - Alguns problemas leves corrigidos;
