@@ -30,10 +30,12 @@ struct Ip{
 
 // ------------------
 // EXTERNAS
+int pegarIdCliente(char nome[]);
 int carregarClientes();
 int logar(char nome[], char senha[]);
 void finalizarSessao();
 int opLs(int cliente, int port, char ipCliente[], int passiveMode, char pasta[]);
+int opPasv(int cliente, int porta, char ipCliente[]);
 void opQuit(int cliente, int idCliente, char ipCliente[]);
 int opCwd(int cliente, int status, char pasta[]);
 char* opCwdPonto(int cliente, char pasta[]);
@@ -54,6 +56,7 @@ int sairPasta(char pasta[]);
 char* rPasta(char pasta[]);
 char* aPasta(char pasta[], char newPasta[]);
 int contarPastas(char pasta[]);
+char* verificarString(char pasta[]);
 //-------------------
 // INTERNAS
 void encontrarComando(char msg[]);
@@ -196,6 +199,7 @@ void conversa(int cliente, int idCliente, int numThread, int passiveMode, int st
     char usernameCliente[20];
     char pastaAtual[100], pasta1[150];
     char* auxPasta;
+    int statusPasta;
     int pasta=0;
     strcpy(pastaAtual, "");
     pastaAtual[0] = '\0';
@@ -257,7 +261,14 @@ void conversa(int cliente, int idCliente, int numThread, int passiveMode, int st
 
         switch(op){
             case 1:
-                status = opLs(cliente, port, ip[numThread].ipCliente, passiveMode, pastaAtual);
+                statusPasta = vPasta(pastaAtual);
+                if(statusPasta == 0){
+                    status = opLs(cliente, port, ip[numThread].ipCliente, passiveMode, pastaAtual);
+                }else{
+                    printf("LIST pasta invalida, impossível continuar executando este cliente\n");
+                    strcpy(msgEnvia, "450 erro ao acessar a pasta, recomendavel utilizar 'quit' e conectar novamente.\n");
+                    write(cliente, msgEnvia, strlen(msgEnvia)+1);
+                }
                 break;
             case 4:
                 /*pasta = opCwd(cliente, parametro);
@@ -280,6 +291,7 @@ void conversa(int cliente, int idCliente, int numThread, int passiveMode, int st
                 if(pasta > 0){
                     pasta--;
                     auxPasta = opCwdPonto(cliente, pastaAtual);
+                    auxPasta = verificarString(auxPasta);
                     strcpy(pastaAtual, auxPasta);
                 }else{
                     strcpy(msgEnvia, "550 Ja esta na pasta raiz do usuario\n");
@@ -291,12 +303,27 @@ void conversa(int cliente, int idCliente, int numThread, int passiveMode, int st
                 status = opPwd(cliente, pastaAtual);
                 break;
             case 10:
-                auxPasta = aPasta(pastaAtual, parametro);
-                status = opPut(cliente, parametro, ip[numThread].ipCliente, port, passiveMode);
+                statusPasta = vPasta(pastaAtual);
+                if(statusPasta == 0){
+                    auxPasta = aPasta(pastaAtual, parametro);
+
+                    status = opPut(cliente, parametro, ip[numThread].ipCliente, port, passiveMode);
+                }else{
+                    printf("PUT pasta invalida, impossível continuar executando este cliente\n");
+                    strcpy(msgEnvia, "450 erro ao acessar a pasta\n");
+                    write(cliente, msgEnvia, strlen(msgEnvia)+1);
+                }
                 break;
             case 11:
-                auxPasta = aPasta(pastaAtual, parametro);
-                status = opGet(cliente, ip[numThread].ipCliente, port, auxPasta, passiveMode);
+                statusPasta = vPasta(pastaAtual);
+                if(statusPasta == 0){
+                    auxPasta = aPasta(pastaAtual, parametro);
+                    status = opGet(cliente, ip[numThread].ipCliente, port, auxPasta, passiveMode);
+                }else{
+                    printf("GET pasta invalida, impossível continuar executando este cliente\n");
+                    strcpy(msgEnvia, "450 erro ao acessar a pasta\n");
+                    write(cliente, msgEnvia, strlen(msgEnvia)+1);
+                }
                 break;
             case 20:
                 auxPasta = aPasta(pastaAtual, parametro);
@@ -340,8 +367,8 @@ void conversa(int cliente, int idCliente, int numThread, int passiveMode, int st
                 passiveMode = 0;
                 break;
             case 51:
-                port = opPasv(cliente, PORTA, ip[numThread].ipCliente);
-                //port = opPasv(cliente, PORTA, myIp);
+                //port = opPasv(cliente, PORTA, ip[numThread].ipCliente);
+                port = opPasv(cliente, PORTA, myIp);
                 printf("Porta: %i\n", port);
                 passiveMode = 1;
                 break;
@@ -564,4 +591,29 @@ void loopErro(){
         write(cliente, msgEnvia, strlen(msgEnvia)+1);
         close(cliente);
     }
+}
+
+char* verificarString(char pasta[]){
+    int i, tam, nPastas, z=0;
+    char *new, *new2;
+    tam = strlen(pasta);
+    nPastas = contarPastas(pasta)-1;
+    //printf("Inicial: %s, %i\n", pasta, nPastas);
+    new = (char*)malloc(sizeof(char)*tam);
+    new2 = (char*)malloc(sizeof(char)*tam);
+    for(i=0; i<tam; i++){
+        if((pasta[i] == '/') && (z==(nPastas-1))){
+            return new;
+        }
+        else if((pasta[i] == '/') && (z != (nPastas-1))){
+            z++;
+            //printf("Barra!\n");
+            new[i] = pasta[i];
+        }else if(isascii((int)pasta[i]) != 0)
+            new[i] = pasta[i];
+        //printf("%i: %s\n", i, new);
+    }
+    new[i] = '\0';
+    strcpy(new2, new);
+    return new2;
 }

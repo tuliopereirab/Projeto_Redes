@@ -240,4 +240,14 @@
         * Isso eivta que o arquivo fique desconfigurado
         * As funções de adição de senha foram mantidas, porém comentadas. A única mudança é que agora não salva a senha no arquivo.
     - Recebimento do Ip do servidor por parâmetro corrigido
-    
+
+7.32
+    - Modificações no PASV
+        * agora o PASV cria uma thread para esperar conexão que será executada até receber conexão.
+        * O servidor seguira executando, mesmo que não receba conexão, a diferença é que quando iniciar uma função Get, Put ou List em modo passivo, será verificado se houve conexão por meio de uma variável de controle no arquivo connection.c
+        * Caso não tenha havido conexão, o servidor simplesmente desconsiderará o comando e retornará um erro ao cliente
+    - Problema com List seguido de CDUP
+        * Se for dado um comando List e apos um CDUP, a pasta retornará à string com erro (adição de caracteres especiais que tornarão a pasta inacessável).
+        * O problema não foi resolvido, porém foi adicionado um teste que evita que haja falha de segmentação
+        * Então, sempre que for executar um comando que fará dentro de uma pasta, será utilizada a função 'vPasta' para verificar se a pasta é valida, caso não seja, irá retornar uma mensagem de erro ao cliente com o código 450, indicando que não foi possível executar o comando solicitado.
+        * Para tentar corrigir o problema, foi criada uma função de verificação das pastas sempre que é utilizado CDUP, porém os caracteres especiais adicionados também podem estar em formato ASCII, logo é difícil verificar que a pasta não é válida. 

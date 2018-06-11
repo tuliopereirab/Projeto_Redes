@@ -33,7 +33,9 @@ int opPort(char portas[]);
 //--------------------------
 // CONNECTION.C
 int iniciarConexaoDados(int cliente, int port, char ipCliente[]);
-int conexaoModoPassivo(int cliente, int port);
+void conexaoModoPassivo(int port);
+int retornarDataCon();
+int statusThread();
 //--------------------------
 // PORTA.C
 int calcPort(int val1, int val2);
@@ -55,3 +57,4 @@ int sairPasta(char pasta[]);
 char* rPasta(char pasta[]);
 char* aPasta(char pasta[], char newPasta[]);
 int contarPastas(char pasta[]);
+char* verificarString(char pasta[]);

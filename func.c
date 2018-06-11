@@ -9,6 +9,8 @@
 #include <sys/ioctl.h>
 #include <fcntl.h>
 
+#include <pthread.h>
+
 #include <dirent.h>
 
 struct vetChar{
@@ -17,6 +19,12 @@ struct vetChar{
 
 #define MAXBUF 100
 
+struct argus{
+    int port;
+};
+
+int statusThread();
+void *chamadaThreadData(void *arg);
 int iniciarConexaoDados(int cliente, int port, char ipCliente[]);
 int calcPort(int val1, int val2);
 int calcPortPASV(int val, int set);
@@ -24,7 +32,6 @@ void finalizarSessao(int idCliente);
 void loopErro();
 char* readFileBytes(const char *name);
 char* correcaoPort(char aux[]);
-int conexaoModoPassivo(int cliente, int port);
 int vPasta(char pasta[]);
 int cPasta(char pasta[], char nome[], int op);
 int ePasta(char pasta[]);
@@ -32,6 +39,8 @@ int sairPasta(char pasta[]);
 char* rPasta(char pasta[]);
 char* aPasta(char pasta[], char newPasta[]);
 int contarPastas(char pasta[]);
+void conexaoModoPassivo(int port);
+int retornarDataCon();
 
 void opQuit(int cliente, int idCliente, char ipCliente[]){
     int statusFinalizar;
@@ -125,14 +134,23 @@ int opLs(int cliente, int port, char ipCliente[], int passiveMode, char pasta[])
     //int arquivo;
     char msgEnvia[100];
     char *arquivo;
+    int statusPassive;
     char *enviar = (char*)malloc(sizeof(char)*1000);
     FILE *arq;
 
     if(passiveMode == 0)
         dataCon = iniciarConexaoDados(cliente, port, ipCliente);
-    else
-        dataCon = conexaoModoPassivo(cliente, port);
-
+    else{
+        statusPassive = statusThread();
+        if(statusPassive == 0){
+            printf("LS servidor nao recebeu conexao dados do modo passivo\n");
+            strcpy(msgEnvia, "450 erro ao receber conexao de dados\n");
+            write(cliente, msgEnvia, strlen(msgEnvia)+1);
+            return 0;
+        }else
+            dataCon = retornarDataCon();
+        //dataCon = conexaoModoPassivo(cliente, port);
+    }
     if(dataCon == 0){
         return 0;
     }else{
@@ -157,12 +175,13 @@ int opLs(int cliente, int port, char ipCliente[], int passiveMode, char pasta[])
         //printf("ListaPasta: %s\n", enviar);
         write(dataCon, enviar, strlen(enviar)+1);
         free(enviar);
+        free(lsdir);
         close(dataCon);
         strcpy(msgEnvia, "250 Arquivo enviado\n");
         write(cliente, msgEnvia, strlen(msgEnvia)+1);
         printf("LIST enviado\n");
-        system("rm temp.txt");
-        system("rm temp2.txt");
+        //system("rm temp.txt");
+        //system("rm temp2.txt");
         return 1;
     }
 }
@@ -172,9 +191,23 @@ int opPasv(int cliente, int porta, char ipCliente[]){
     int i, j=0, z=0, p1int, p2int;
     char msgEnviar[100];
     int port = 0;
+    struct argus *args;
+    pthread_t t;
+    int dataCon;
     while(port < 1023)
         port = rand() % 65000;
     printf("PORTA RANDOMICA: %i\n", port);
+    //-------------------------------------------------------------
+    args = malloc(sizeof(struct argus));
+    args->port = port;
+    pthread_create(&t, NULL, chamadaThreadData, (void *)&args);
+    /*if((pthread_create(&t, NULL, chamadaThreadData, (void *)&args)) == 0)){
+        printf("PASV erro ao criar thread de conexao de dados!\n");
+        return 0;
+    }else
+        printf("THread criada!\n");
+    *///-------------------------------------------------------------
+
     for(i=0; i<strlen(ipCliente); i++){
         if(ipCliente[i] == '.'){
             j++;
@@ -245,12 +278,17 @@ int opPasv(int cliente, int porta, char ipCliente[]){
     strcat(msgEnviar, p2);
     strcat(msgEnviar, ").\n");
 
+    printf("PASV thread esperando conexao!\n");
     printf("MENSAGEM ENVIAR: %s\n", msgEnviar);
     write(cliente, msgEnviar, strlen(msgEnviar)+1);
-    //int dataCon = conexaoModoPassivo(cliente, port);
     return port;
 }
 
+void *chamadaThreadData(void *arg){
+    struct argus *args = arg;
+    printf("PASV thread dados iniciada\n");
+    conexaoModoPassivo(args->port);
+}
 
 int opCwd(int cliente, int status, char pasta[]){
     char msgEnvia[100];
@@ -297,10 +335,20 @@ int opPut(int cliente, char nomeArquivo[], char ipCliente[], int port, int passi
     char temp[100];
     struct vetChar *vet;
     int tamArq;
+    int statusPassive;
     if(passiveMode == 0)
         dataCon = iniciarConexaoDados(cliente, port, ipCliente);
-    else
-        dataCon = conexaoModoPassivo(cliente, port);
+    else{
+        statusPassive = statusThread();
+        if(statusPassive == 0){
+            printf("LS servidor nao recebeu conexao dados do modo passivo\n");
+            strcpy(msgEnvia, "450 erro ao receber conexao de dados\n");
+            write(cliente, msgEnvia, strlen(msgEnvia)+1);
+            return 0;
+        }else
+            dataCon = retornarDataCon();
+        //dataCon = conexaoModoPassivo(cliente, port);
+    }
 
     if(dataCon == 0){
         printf("ERRO ao abrir conexao de dados, PUT finalizado\n");
@@ -361,7 +409,7 @@ int opPut(int cliente, char nomeArquivo[], char ipCliente[], int port, int passi
         read(dataCon, temp, 100);
     }
 
-*/
+    */
 
     //read(cliente, arquivo, tamanho);
     /*tamanho = 0;
@@ -385,6 +433,7 @@ int opGet(int cliente, char ipCliente[], int port, char nomeArquivo[], int passi
     int tamanho, i;
     int dataCon;
     int arquivo;
+    int statusPassive;
     //char *arquivo;
 
     if(fopen(nomeArquivo, "r+") == NULL){
@@ -397,8 +446,17 @@ int opGet(int cliente, char ipCliente[], int port, char nomeArquivo[], int passi
 
     if(passiveMode == 0)
         dataCon = iniciarConexaoDados(cliente, port, ipCliente);
-    else
-        dataCon = conexaoModoPassivo(cliente, port);
+    else{
+        statusPassive = statusThread();
+        if(statusPassive == 0){
+            printf("LS servidor nao recebeu conexao dados do modo passivo\n");
+            strcpy(msgEnvia, "450 erro ao receber conexao de dados\n");
+            write(cliente, msgEnvia, strlen(msgEnvia)+1);
+            return 0;
+        }else
+            dataCon = retornarDataCon();
+        //dataCon = conexaoModoPassivo(cliente, port);
+    }
 
     if(dataCon == 0){
         printf("ERRO na conexao de dados, GET finalizado\n");

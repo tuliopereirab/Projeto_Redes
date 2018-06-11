@@ -9,7 +9,11 @@
 #include <sys/stat.h>
 #include <sys/sendfile.h>
 #include <fcntl.h>
+#include <pthread.h>
 
+int dataCon1;
+int status = 0;
+int statusThread();
 
 int iniciarConexaoDados(int cliente, int port, char ipCliente[]){
     int dataCon;
@@ -40,8 +44,8 @@ int iniciarConexaoDados(int cliente, int port, char ipCliente[]){
 
 }
 
-int conexaoModoPassivo(int cliente, int port){
-    int s, dataCon;
+void conexaoModoPassivo(int port){
+    int s;
     struct sockaddr_in self;
     int addrlen;
     struct sockaddr_in client;
@@ -55,7 +59,18 @@ int conexaoModoPassivo(int cliente, int port){
     bind(s, (struct sockaddr *)&self, sizeof(self));
     listen(s, 5);
     printf("PASV aguardando conexão do cliente\n");
-    dataCon = accept(s, (struct sockaddr *)&client, &addrlen);
+    dataCon1 = accept(s, (struct sockaddr *)&client, &addrlen);
+    status = 1;
     printf("PASV cliente se conectou\n");
-    return dataCon;
+    pthread_exit(NULL);
+    //system(EXIT_SUCCESS);
+}
+
+int retornarDataCon(){
+    status = 0;
+    return dataCon1;
+}
+
+int statusThread(){
+    return status;
 }

@@ -14,7 +14,7 @@ void separa();
 void inverterPasv();
 void arrumaPasv();
 int convertToDecPASV(int set);
-
+void zerar();
 
 char v1[100], v2[100], conc[100];
 int i1, i2, iConc;

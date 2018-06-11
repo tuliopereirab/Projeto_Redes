@@ -15,12 +15,21 @@
 int vPasta(char pasta[]);
 int cPasta(char pasta[], char nome[], int op);
 int ePasta(char pasta[]);
+char* verificarString(char pastas[]);
 int sairPasta(char pasta[]);
 char* rPasta(char pasta[]);
 char* aPasta(char pasta[], char newPasta[]);
 int contarPastas(char pasta[]);
 
-
+/*
+int main(){
+    char *pastas;
+    pastas = rPasta("tulio/dudi/hue");
+    printf("Pastas: %s\n", pastas);
+    pastas = verificarString(pastas);
+    printf("Pastas2: %s\n", pastas);
+}
+*/
 int vPasta(char pasta[]){
     int i, status, val = contarPastas(pasta);
     printf("ValPastas: %i\n", val);
@@ -71,10 +80,11 @@ char* rPasta(char pasta[]){
             ultTam = i;
         }
     }
-    new = (char*)malloc(sizeof(char)*ultTam);
+    new = (char*)malloc(sizeof(char)*ultTam+1);
     for(i=0; i<ultTam; i++){
         new[i] = pasta[i];
     }
+    new[ultTam] = '/';
     return new;
 }
 
