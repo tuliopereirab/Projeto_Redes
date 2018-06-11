@@ -75,7 +75,7 @@ int port = PORTA+1; // PORT = PORTA DADOS; PORTA = PORTA CONTROLE
 int s;
 struct sockaddr_in client;
 int addrlen;
-char *myIp = NULL;
+char *myIp;
 
 int main(){
     pthread_t *t=NULL;
@@ -124,10 +124,11 @@ int main(){
 
     bind(s, (struct sockaddr *)&self, sizeof(self));
     listen(s, 5);
+    myIp = getMyIp();
     printf("--------------------------------------------------------------\n");
     printf("Servidor ONLINE\n");
-    myIp = getMyIp();
-    printf("\n--------------------------------------------------------------\n");
+    printf("Meu IP: %s\n", myIp);
+    printf("--------------------------------------------------------------\n");
 
     while(1){
         client_s = accept(s, (struct sockaddr *)&client, &addrlen);
@@ -159,9 +160,7 @@ int main(){
             }
         }
         args.posicaoControle = threadDisp;
-        printf("Teste1\n");
         strcpy(ip[threadDisp].ipCliente, ipCliente);
-        printf("Teste2\n");
         if((pthread_create(&t[threadDisp], NULL, inicioThread, (void *)&args) == 0)){
             controleThread[threadDisp] = 1;
             nThreadsOn++;
@@ -181,13 +180,9 @@ int main(){
 void *inicioThread(void *argumentos){
     struct argumentos *args = argumentos;
     char msgEnvia[100];
-    printf("Teste3\n");
     strcpy(msgEnvia, "220 Servico pronto\n");
-    printf("Teste5\n");
     write(args->cliente, msgEnvia, strlen(msgEnvia));
-    printf("Teste6\n");
     printf("THREAD criando thread para cliente IP %s\n", ip[args->posicaoControle].ipCliente);
-    printf("Teste4\n");
     conversa(args->cliente, args->idCliente, args->posicaoControle, args->passiveMode, args->statusLogin);
     controleThread[args->posicaoControle] = 0;
 }
@@ -235,8 +230,7 @@ void conversa(int cliente, int idCliente, int numThread, int passiveMode, int st
                 else if((strcmp(comando, "PWD")) == 0)
                     op = 6;
                 else if((strcmp(comando, "STOR")) == 0)
-                    op = 0;
-                    //op = 10;
+                    op = 10;
                 else if((strcmp(comando, "RETR")) == 0)
                     op = 11;
                 else if((strcmp(comando, "RMD")) == 0)
@@ -297,7 +291,7 @@ void conversa(int cliente, int idCliente, int numThread, int passiveMode, int st
                 status = opPwd(cliente, pastaAtual);
                 break;
             case 10:
-                auxPasta = aPasta(pastaAtual, auxPasta);
+                auxPasta = aPasta(pastaAtual, parametro);
                 status = opPut(cliente, parametro, ip[numThread].ipCliente, port, passiveMode);
                 break;
             case 11:
@@ -347,6 +341,7 @@ void conversa(int cliente, int idCliente, int numThread, int passiveMode, int st
                 break;
             case 51:
                 port = opPasv(cliente, PORTA, ip[numThread].ipCliente);
+                //port = opPasv(cliente, PORTA, myIp);
                 printf("Porta: %i\n", port);
                 passiveMode = 1;
                 break;

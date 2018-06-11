@@ -36,7 +36,7 @@ int contarPastas(char pasta[]);
 void opQuit(int cliente, int idCliente, char ipCliente[]){
     int statusFinalizar;
     char msgEnvia[100];
-    printf("QUIT cliente ID %i finalizando conexão\n");
+    printf("QUIT cliente id %i finalizando conexão\n");
     strcpy(msgEnvia, "221 Finalizando conexao\n");
     write(cliente, msgEnvia, strlen(msgEnvia)+1);
     finalizarSessao(idCliente);
@@ -46,7 +46,7 @@ void opQuit(int cliente, int idCliente, char ipCliente[]){
         close(cliente);
         loopErro();
     }else{*/
-        printf("Servidor retornado para pasta raiz\n");
+        //printf("Servidor retornado para pasta raiz\n");
     //}
     printf("Finalizando conexao: pedido cliente IP %s\n", ipCliente);
     close(cliente);
@@ -230,7 +230,7 @@ int opPasv(int cliente, int porta, char ipCliente[]){
     }
     //h3[1] = '\0';
 
-    printf("h1: %s\nh2: %s\nh3: %s\nh4: %s\np1: %s\np2: %s\n", h1, h2, h3, h4, p1, p2);
+    //printf("h1: %s\nh2: %s\nh3: %s\nh4: %s\np1: %s\np2: %s\n", h1, h2, h3, h4, p1, p2);
     strcpy(msgEnviar, "227 Entering Passive Mode (");
     strcat(msgEnviar, h1);
     strcat(msgEnviar, ",");
@@ -247,7 +247,7 @@ int opPasv(int cliente, int porta, char ipCliente[]){
 
     printf("MENSAGEM ENVIAR: %s\n", msgEnviar);
     write(cliente, msgEnviar, strlen(msgEnviar)+1);
-
+    //int dataCon = conexaoModoPassivo(cliente, port);
     return port;
 }
 

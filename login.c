@@ -27,7 +27,8 @@ int carregarClientes(){
     fscanf(arq, "%i\n", &nClientes);
     listaClientes = malloc(sizeof(struct clientes));
     for(i=0; i<nClientes; i++){
-        fscanf(arq, "%s\t%s\n", &listaClientes[i].nome, &listaClientes[i].senha);
+        //fscanf(arq, "%s\t%s\n", &listaClientes[i].nome, &listaClientes[i].senha);
+        fscanf(arq, "%s\n", &listaClientes[i].nome);
         listaClientes[i].status = 0;
     }
     fclose(arq);
@@ -91,7 +92,8 @@ int cadastrar(char nome[], char senha[]){
 
     fprintf(arq, "%d\n", nClientes);
     for(i=0; i<nClientes; i++){
-        fprintf(arq, "%s\t%s", listaClientes[i].nome, listaClientes[i].senha);
+        //fprintf(arq, "%s\t%s", listaClientes[i].nome, listaClientes[i].senha);
+        fprintf(arq, "%s", listaClientes[i].nome);
         //fprintf(arq, "\t");
         //fprintf(arq, "%s", listaClientes[i].senha);
         if(i < (nClientes-1))

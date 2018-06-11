@@ -7,8 +7,11 @@
 #include<stdlib.h>
 //#include<unistd.h>
 
-char* getMyIp()  // COPIADA EXATAMENTE DA INTERNET, LINK NO ARQUIVO DE LINKS
-{
+char* transformaIp(char host[]);
+char* getMyIp();
+char* getMyIp(){  // COPIADA EXATAMENTE DA INTERNET, LINK NO ARQUIVO DE LINKS
+
+    char* meuIp;
     FILE *f;
     char line[100] , *p , *c;
 
@@ -63,11 +66,15 @@ char* getMyIp()  // COPIADA EXATAMENTE DA INTERNET, LINK NO ARQUIVO DE LINKS
                     exit(EXIT_FAILURE);
                 }
 
-                printf("Meu IP: %s", host);
+                //printf("Meu IP: %s", host);
             }
         }
     }
-
+    meuIp = transformaIp(host);
     freeifaddrs(ifaddr);
+    return meuIp;
+}
+
+char* transformaIp(char host[]){
     return host;
 }

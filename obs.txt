@@ -231,4 +231,13 @@
 
 7.3
     - Problema dos endereços IPs de todos os clientes serem iguais ao do último conectado RESOLVIDO
-    - Problema LIST resolvido: agora enviar em formato ASCII e mostrando no cliente!
+    - Problema LIST resolvido: agora envia em formato ASCII e mostrando no cliente!
+
+7.31
+    - Printf de testes retirados;
+    - Login corrigido
+        * sempre que cadastrava um novo cliente, era salvo 'login' e 'senha', agora só salva 'login' porque a senha é desprezível
+        * Isso eivta que o arquivo fique desconfigurado
+        * As funções de adição de senha foram mantidas, porém comentadas. A única mudança é que agora não salva a senha no arquivo.
+    - Recebimento do Ip do servidor por parâmetro corrigido
+    
