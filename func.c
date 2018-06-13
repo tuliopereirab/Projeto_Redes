@@ -332,7 +332,6 @@ int opPut(int cliente, char nomeArquivo[], char ipCliente[], int port, int passi
     int tamanho, fileh, i, j, z;
     ssize_t tamT;
     char *arquivo = NULL;
-    //int *arquivo = NULL;
     char msgEnvia[100];
     char temp[100];
     struct vetChar *vet;
