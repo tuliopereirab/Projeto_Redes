@@ -223,6 +223,7 @@
 7.2.1
         - Alguns problemas leves corrigidos;
 
+
 7.2.1.3
     ********* APOIO.C MODIFICADO E COM MAIN, NÃO COMPILAR
         - problema no IP: o IP do último cliente fica como se fosse o IP de todos os clientes
@@ -250,4 +251,8 @@
         * Se for dado um comando List e apos um CDUP, a pasta retornará à string com erro (adição de caracteres especiais que tornarão a pasta inacessável).
         * O problema não foi resolvido, porém foi adicionado um teste que evita que haja falha de segmentação
         * Então, sempre que for executar um comando que fará dentro de uma pasta, será utilizada a função 'vPasta' para verificar se a pasta é valida, caso não seja, irá retornar uma mensagem de erro ao cliente com o código 450, indicando que não foi possível executar o comando solicitado.
-        * Para tentar corrigir o problema, foi criada uma função de verificação das pastas sempre que é utilizado CDUP, porém os caracteres especiais adicionados também podem estar em formato ASCII, logo é difícil verificar que a pasta não é válida. 
+        * Para tentar corrigir o problema, foi criada uma função de verificação das pastas sempre que é utilizado CDUP, porém os caracteres especiais adicionados também podem estar em formato ASCII, logo é difícil verificar que a pasta não é válida.
+
+7.321
+    - Problema do LIST com CDUP resolvido
+        * adicionado '\0' ao final da função "verificarString"

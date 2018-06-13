@@ -264,7 +264,7 @@ int opPasv(int cliente, int porta, char ipCliente[]){
     //h3[1] = '\0';
 
     //printf("h1: %s\nh2: %s\nh3: %s\nh4: %s\np1: %s\np2: %s\n", h1, h2, h3, h4, p1, p2);
-    strcpy(msgEnviar, "227 Entering Passive Mode (");
+    strcpy(msgEnviar, "227 entrando em modo passivo (");
     strcat(msgEnviar, h1);
     strcat(msgEnviar, ",");
     strcat(msgEnviar, h2);
@@ -277,7 +277,7 @@ int opPasv(int cliente, int porta, char ipCliente[]){
     strcat(msgEnviar, ",");
     strcat(msgEnviar, p2);
     strcat(msgEnviar, ").\n");
-
+    //strcat(msgEnviar, "\0");
     printf("PASV thread esperando conexao!\n");
     printf("MENSAGEM ENVIAR: %s\n", msgEnviar);
     write(cliente, msgEnviar, strlen(msgEnviar)+1);
@@ -312,9 +312,11 @@ char* opCwdPonto(int cliente, char pasta[]){
     char *new;
     printf("CDUP solicitado\n");
     new = rPasta(pasta);
+    //printf("NEW: %s\n", new);
     strcpy(msgEnvia, "200 diretorio alterado\n");
     write(cliente, msgEnvia, strlen(msgEnvia)+1);
     printf("CDUP diretório anterior acessado\n");
+
     return new;
     /*}else{
         strcpy(msgEnvia, "550 erro ao acessar diretorio\n");

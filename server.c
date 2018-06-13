@@ -287,7 +287,7 @@ void conversa(int cliente, int idCliente, int numThread, int passiveMode, int st
                 status = opCwd(cliente, status, parametro);
                 break;
             case 5:
-                printf("Pasta 1: %i\n", pasta);
+                //printf("Pasta 1: %i\n", pasta);
                 if(pasta > 0){
                     pasta--;
                     auxPasta = opCwdPonto(cliente, pastaAtual);
@@ -603,6 +603,7 @@ char* verificarString(char pasta[]){
     new2 = (char*)malloc(sizeof(char)*tam);
     for(i=0; i<tam; i++){
         if((pasta[i] == '/') && (z==(nPastas-1))){
+            new[i] = '\0';
             return new;
         }
         else if((pasta[i] == '/') && (z != (nPastas-1))){
@@ -613,7 +614,6 @@ char* verificarString(char pasta[]){
             new[i] = pasta[i];
         //printf("%i: %s\n", i, new);
     }
-    new[i] = '\0';
     strcpy(new2, new);
     return new2;
 }
