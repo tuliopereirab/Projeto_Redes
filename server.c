@@ -16,17 +16,15 @@
 #define MAXBUF 100
 
 int entrarPasta(int nomePasta[]);
-void conversa(int cliente, int idCliente, int numThread, int passiveMode, int statusLogin);
+void conversa(int cliente, int idCliente, int numThread, int passiveMode, int statusLogin, char ipCliente[]);
 int finalizarConexao();
 
 struct argumentos{
     int cliente, idCliente, passiveMode, statusLogin;
     int posicaoControle;
-};
-
-struct Ip{
     char ipCliente[INET_ADDRSTRLEN];
 };
+
 
 // ------------------
 // EXTERNAS
@@ -69,7 +67,6 @@ void *inicioThread(void *argumentos);
 //-------------------
 
 
-struct Ip *ip;
 int *controleThread=NULL;        // verificar commit versão 7.1
 int statusServidor = 0;
 char parametro[20];
@@ -146,10 +143,10 @@ int main(){
         args.cliente = client_s;
         args.passiveMode = passiveMode;
         args.statusLogin = statusLogin;
+        strcpy(args.ipCliente, ipCliente);
         if(t == NULL){
             t = malloc(sizeof(pthread_t));
             controleThread = malloc(sizeof(int));
-            ip = (struct Ip*)malloc(sizeof(struct Ip));
             threadDisp=0;
         }
         else{
@@ -157,13 +154,12 @@ int main(){
             if(threadDisp == -1){
                 t = realloc(t, sizeof(pthread_t)*nThreadsOn);
                 controleThread = realloc(controleThread, sizeof(int)*nThreadCriadas+1);
-                ip = realloc(ip, sizeof(struct Ip)*nThreadCriadas+1);
                 threadDisp = nThreadCriadas;
                 nThreadCriadas++;
             }
         }
         args.posicaoControle = threadDisp;
-        strcpy(ip[threadDisp].ipCliente, ipCliente);
+        //strcpy(ip[threadDisp].ipCliente, ipCliente);
         if((pthread_create(&t[threadDisp], NULL, inicioThread, (void *)&args) == 0)){
             controleThread[threadDisp] = 1;
             nThreadsOn++;
@@ -182,15 +178,16 @@ int main(){
 
 void *inicioThread(void *argumentos){
     struct argumentos *args = argumentos;
+    char intIpCliente[INET_ADDRSTRLEN];
+    strcpy(intIpCliente, args->ipCliente);
     char msgEnvia[100];
     strcpy(msgEnvia, "220 Servico pronto\n");
     write(args->cliente, msgEnvia, strlen(msgEnvia));
-    printf("THREAD criando thread para cliente IP %s\n", ip[args->posicaoControle].ipCliente);
-    conversa(args->cliente, args->idCliente, args->posicaoControle, args->passiveMode, args->statusLogin);
-    controleThread[args->posicaoControle] = 0;
+    printf("THREAD criando thread para cliente IP %s\n", intIpCliente);
+    conversa(args->cliente, args->idCliente, args->posicaoControle, args->passiveMode, args->statusLogin, intIpCliente);
 }
 
-void conversa(int cliente, int idCliente, int numThread, int passiveMode, int statusLogin){
+void conversa(int cliente, int idCliente, int numThread, int passiveMode, int statusLogin, char ipCliente[]){
     int op = 88;
     int status;
     int i, j;
@@ -204,8 +201,8 @@ void conversa(int cliente, int idCliente, int numThread, int passiveMode, int st
     strcpy(pastaAtual, "");
     pastaAtual[0] = '\0';
     do{
-        printf("ipCliente: %s\n", ip[numThread].ipCliente);
-        printf("------------");
+        printf("ipCliente: %s\n", ipCliente);
+        printf("------------\n");
 
         //system("pwd");
         //printf("------------------\n");
@@ -263,7 +260,7 @@ void conversa(int cliente, int idCliente, int numThread, int passiveMode, int st
             case 1:
                 statusPasta = vPasta(pastaAtual);
                 if(statusPasta == 0){
-                    status = opLs(cliente, port, ip[numThread].ipCliente, passiveMode, pastaAtual);
+                    status = opLs(cliente, port, ipCliente, passiveMode, pastaAtual);
                 }else{
                     printf("LIST pasta invalida, impossível continuar executando este cliente\n");
                     strcpy(msgEnvia, "450 erro ao acessar a pasta, recomendavel utilizar 'quit' e conectar novamente.\n");
@@ -307,7 +304,7 @@ void conversa(int cliente, int idCliente, int numThread, int passiveMode, int st
                 if(statusPasta == 0){
                     auxPasta = aPasta(pastaAtual, parametro);
 
-                    status = opPut(cliente, parametro, ip[numThread].ipCliente, port, passiveMode);
+                    status = opPut(cliente, parametro, ipCliente, port, passiveMode);
                 }else{
                     printf("PUT pasta invalida, impossível continuar executando este cliente\n");
                     strcpy(msgEnvia, "450 erro ao acessar a pasta\n");
@@ -318,7 +315,7 @@ void conversa(int cliente, int idCliente, int numThread, int passiveMode, int st
                 statusPasta = vPasta(pastaAtual);
                 if(statusPasta == 0){
                     auxPasta = aPasta(pastaAtual, parametro);
-                    status = opGet(cliente, ip[numThread].ipCliente, port, auxPasta, passiveMode);
+                    status = opGet(cliente, ipCliente, port, auxPasta, passiveMode);
                 }else{
                     printf("GET pasta invalida, impossível continuar executando este cliente\n");
                     strcpy(msgEnvia, "450 erro ao acessar a pasta\n");
@@ -367,7 +364,7 @@ void conversa(int cliente, int idCliente, int numThread, int passiveMode, int st
                 passiveMode = 0;
                 break;
             case 51:
-                //port = opPasv(cliente, PORTA, ip[numThread].ipCliente);
+                //port = opPasv(cliente, PORTA, ipCliente);
                 port = opPasv(cliente, PORTA, myIp);
                 printf("Porta: %i\n", port);
                 passiveMode = 1;
@@ -384,7 +381,7 @@ void conversa(int cliente, int idCliente, int numThread, int passiveMode, int st
                 printf("QUIT solicitado pelo cliente\n\n");
                 statusLogin = 0;
                 passiveMode = 0;
-                opQuit(cliente, idCliente, ip[numThread].ipCliente);
+                opQuit(cliente, idCliente, ipCliente);
                 break;
             case 0:
                 printf("ERRO, comando digitado invalido\n\n");
