@@ -64,6 +64,7 @@ int entraPasta(char nomePasta[]);
 int finalizarConexao();
 void loopErro();
 void *inicioThread(void *argumentos);
+int server(int maxTaxa);
 //-------------------
 
 
@@ -77,7 +78,7 @@ struct sockaddr_in client;
 int addrlen;
 char *myIp;
 
-int main(){
+int server(int maxTaxa){
     pthread_t *t=NULL;
     int nThreadsOn=1;
     struct argumentos args;

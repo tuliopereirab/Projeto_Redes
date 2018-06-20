@@ -1,4 +1,6 @@
 #include <stdio.h>
+#include "main.c"
+#include "arquivo.c"
 #include "server.c"
 #include "func.c"
 #include "login.c"
@@ -7,7 +9,12 @@
 #include "apoio.c"
 #include "getMyIp.c"
 #include "pastas.c"
+#include "help.c"
 
+
+// MAIN.c
+int main(int argc, char **argv);
+//--------------------------
 // LOGIN.C
 int carregarClientes();
 void finalizarSessao(int idCliente);
@@ -15,6 +22,7 @@ int logar(char nome[], char senha[]);
 int pegarIdCliente(char nome[]);
 //--------------------------
 // SERVER.C
+int server(int maxTaxa);
 int opUser(int cliente, char usernameCliente[]);
 void loopErro();
 //--------------------------
@@ -58,3 +66,10 @@ char* rPasta(char pasta[]);
 char* aPasta(char pasta[], char newPasta[]);
 int contarPastas(char pasta[]);
 char* verificarString(char pasta[]);
+//--------------------------
+// HELP.C
+void ajuda();
+//--------------------------
+// ARQUIVO.C
+void arquivo(char maxTaxaS[]);
+int lerArquivo();
