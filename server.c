@@ -201,13 +201,22 @@ void *inicioThread(void *argumentos){
 }
 
 void *controlarTaxas(){
+    float lastClientesAtivos = nClientesAtivos;
+    taxaPorCliente = taxaSetada;
     printf("Thread de controle iniciada!\n");
     while(1){
         if(nClientesAtivos != 0)
-            taxaPorCliente = taxaSetada/nClientesAtivos;
-        else
-            taxaPorCliente = taxaSetada;
+            if(nClientesAtivos != lastClientesAtivos){
+                taxaPorCliente = taxaSetada/nClientesAtivos;
+                lastClientesAtivos = nClientesAtivos;
+            }
+        else{
+            if(lastClientesAtivos != nClientesAtivos){
+                taxaPorCliente = taxaSetada;
+                lastClientesAtivos = nClientesAtivos;
+            }
 
+        }
         //printf("Taxa: %.2f\n", taxaPorCliente);
         sleep(1);
     }
@@ -236,11 +245,7 @@ void conversa(int cliente, int idCliente, int numThread, int passiveMode, int st
     do{
         printf("------------\n");
         // ---------------------------------
-        while(controleEscrita != 0)  {}
-        controleEscrita = 1;
-        taxaPorCliente = taxaSetada/nClientesAtivos;
-        controleEscrita = 0;
-        printf("Taxa por cliente: %.2f\n", taxaPorCliente);
+        printf("Taxa de transferencia por cliente: %.2f\n", taxaPorCliente);
         // ---------------------------------
         printf("ipCliente: %s\n", ipCliente);
 
