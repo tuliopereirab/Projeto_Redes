@@ -10,6 +10,8 @@
 #include <sys/sendfile.h>
 #include <fcntl.h>
 
+#include <time.h>
+
 #include <pthread.h>
 
 #define PORTA 8080
@@ -64,13 +66,14 @@ int entraPasta(char nomePasta[]);
 int finalizarConexao();
 void loopErro();
 void *inicioThread(void *argumentos);
-int server(int maxTaxa);
+int server(float maxTaxa);
+void *controlarTaxas();
 //-------------------
 
 // gerenciamento de numero de pastas
-int taxaSetada;
-int taxaPorCliente;
-int nClientesAtivos=0;
+float taxaSetada;
+float taxaPorCliente;
+float nClientesAtivos=0;
 int controleEscrita=0;
 //---------------------------------
 
@@ -85,8 +88,8 @@ struct sockaddr_in client;
 int addrlen;
 char *myIp;
 
-int server(int maxTaxa){
-    pthread_t *t=NULL;
+int server(float maxTaxa){
+    pthread_t *t=NULL, *controleTaxa;
     int nThreadsOn=1;
     struct argumentos args;
     //----------------------
@@ -119,6 +122,7 @@ int server(int maxTaxa){
 
 
     statusClientes = carregarClientes();
+    pthread_create(&controleTaxa, NULL, controlarTaxas, NULL);
 
     if(statusClientes == 0){
         printf("Erro ao carregar clientes\n");
@@ -196,6 +200,20 @@ void *inicioThread(void *argumentos){
     conversa(args->cliente, args->idCliente, args->posicaoControle, args->passiveMode, args->statusLogin, intIpCliente);
 }
 
+void *controlarTaxas(){
+    printf("Thread de controle iniciada!\n");
+    while(1){
+        if(nClientesAtivos != 0)
+            taxaPorCliente = taxaSetada/nClientesAtivos;
+        else
+            taxaPorCliente = taxaSetada;
+
+        //printf("Taxa: %.2f\n", taxaPorCliente);
+        sleep(1);
+    }
+
+}
+
 void conversa(int cliente, int idCliente, int numThread, int passiveMode, int statusLogin, char ipCliente[]){
     int op = 88;
     int status;
@@ -216,15 +234,16 @@ void conversa(int cliente, int idCliente, int numThread, int passiveMode, int st
     controleEscrita = 0;
     // --------------------------------
     do{
+        printf("------------\n");
         // ---------------------------------
         while(controleEscrita != 0)  {}
         controleEscrita = 1;
         taxaPorCliente = taxaSetada/nClientesAtivos;
         controleEscrita = 0;
-        printf("Taxa por cliente: %i\n", taxaPorCliente);
+        printf("Taxa por cliente: %.2f\n", taxaPorCliente);
         // ---------------------------------
         printf("ipCliente: %s\n", ipCliente);
-        printf("------------\n");
+
 
         //system("pwd");
         //printf("------------------\n");

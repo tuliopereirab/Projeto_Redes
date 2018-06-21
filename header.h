@@ -22,7 +22,7 @@ int logar(char nome[], char senha[]);
 int pegarIdCliente(char nome[]);
 //--------------------------
 // SERVER.C
-int server(int maxTaxa);
+int server(float maxTaxa);
 int opUser(int cliente, char usernameCliente[]);
 void loopErro();
 //--------------------------
@@ -72,4 +72,4 @@ void ajuda();
 //--------------------------
 // ARQUIVO.C
 void arquivo(char maxTaxaS[]);
-int lerArquivo();
+float lerArquivo();
