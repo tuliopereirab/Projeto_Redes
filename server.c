@@ -67,6 +67,13 @@ void *inicioThread(void *argumentos);
 int server(int maxTaxa);
 //-------------------
 
+// gerenciamento de numero de pastas
+int taxaSetada;
+int taxaPorCliente;
+int nClientesAtivos=0;
+int controleEscrita=0;
+//---------------------------------
+
 
 int *controleThread=NULL;        // verificar commit versão 7.1
 int statusServidor = 0;
@@ -100,6 +107,7 @@ int server(int maxTaxa){
     int statusFinalizar, statusPastaRaiz;
     int nThreadCriadas=1, threadDisp;
 
+    taxaSetada = maxTaxa;
 
     statusPastaRaiz = chdir("pastasClientes");
     if(statusPastaRaiz != 0){
@@ -201,7 +209,20 @@ void conversa(int cliente, int idCliente, int numThread, int passiveMode, int st
     int pasta=0;
     strcpy(pastaAtual, "");
     pastaAtual[0] = '\0';
+    // --------------------------------
+    while(controleEscrita != 0){}
+    controleEscrita = 1;
+    nClientesAtivos++;
+    controleEscrita = 0;
+    // --------------------------------
     do{
+        // ---------------------------------
+        while(controleEscrita != 0)  {}
+        controleEscrita = 1;
+        taxaPorCliente = taxaSetada/nClientesAtivos;
+        controleEscrita = 0;
+        printf("Taxa por cliente: %i\n", taxaPorCliente);
+        // ---------------------------------
         printf("ipCliente: %s\n", ipCliente);
         printf("------------\n");
 
@@ -395,6 +416,12 @@ void conversa(int cliente, int idCliente, int numThread, int passiveMode, int st
         }
     }while(op != 99);
     controleThread[numThread] = 0;
+    // -------------------------------
+    while(controleEscrita != 0){}         // aguarda qualquer outra função acabar de escrever
+    controleEscrita = 1;                  // diz que irá começar a escrveer
+    nClientesAtivos--;                    // atualiza o valor
+    controleEscrita=0;                    // diz qeu acabou de escrever
+    //-----------------------------------
     system(EXIT_SUCCESS);
 }
 
