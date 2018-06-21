@@ -9,6 +9,7 @@
 #include <sys/ioctl.h>
 #include <fcntl.h>
 
+#include <time.h>
 #include <pthread.h>
 
 #include <dirent.h>
@@ -436,6 +437,8 @@ int opGet(int cliente, char ipCliente[], int port, char nomeArquivo[], int passi
     int arquivo;
     int statusPassive;
     //char *arquivo;
+    int nBytes = 0;
+
 
     if(fopen(nomeArquivo, "r+") == NULL){
         strcpy(msgEnvia, "550 Arquivo inexistente\n");
@@ -477,6 +480,23 @@ int opGet(int cliente, char ipCliente[], int port, char nomeArquivo[], int passi
     if(tamanho){
         sendfile(dataCon, arquivo, NULL, tamanho);
     }
+    /*
+    tamanho = strlen(arquivo);
+    int maxTaxa = 10;
+    i=0;
+
+    while(i < tamanho){
+        if(nBytes >= maxTaxa){
+            printf("Esperou!\n");
+            sleep(1);
+            nBytes = 0;
+        }
+        //printf("%c\n", arquivo[i]);
+        sendfile(dataCon, &arquivo[i], NULL, sizeof(char));
+        printf("Enviou!\n");
+        nBytes++;
+        i++;
+    }*/
     printf("GET arquivo enviado\n");
     strcpy(msgEnvia, "226 Arquivo enviado com sucesso\n");
     write(cliente, msgEnvia, strlen(msgEnvia)+1);
