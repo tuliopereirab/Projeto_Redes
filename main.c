@@ -3,14 +3,15 @@
 #include <string.h>
 
 
-int server(float maxTaxa);
+int server(int maxTaxa);
 void arquivo(char maxTaxaS[]);
-float lerArquivo();
+int lerArquivo();
 void ajuda();
+int lerArquivoTaxas();
 
 int main(int argc, char **argv){
-    int op;
-    float maxTaxa;
+    int op, status;
+    int maxTaxa;
     if(argc == 1){
         printf("Erro ao iniciar servidor, por favor utilize './Server -h' ou './Server --help' para receber ajuda.\n");
         return 0;
@@ -19,6 +20,11 @@ int main(int argc, char **argv){
             printf("Iniciar servidor!\n");
             maxTaxa = lerArquivo();
             printf("Taxa máxima recebida.\n");
+            status = lerArquivoTaxas();
+            if(status == 1)
+                printf("Taxas dos clientes carregadas.\n");
+            else
+                printf("Nenhuma taxa para carregar.\n");
             server(maxTaxa);
         }
         else if(((strcmp(argv[1], "-a")) == 0) || ((strcmp(argv[1], "--arquivo")) == 0))

@@ -17,14 +17,14 @@
 #define PORTA 8080
 #define MAXBUF 100
 
-int entrarPasta(int nomePasta[]);
-void conversa(int cliente, int idCliente, int numThread, int passiveMode, int statusLogin, char ipCliente[]);
+int entrarPasta(int nomePasta[]);void conversa(int cliente, int idCliente, int numThread, int passiveMode, int statusLogin, char ipCliente[], int taxaPorCliente);
 int finalizarConexao();
 
 struct argumentos{
     int cliente, idCliente, passiveMode, statusLogin;
     int posicaoControle;
     char ipCliente[INET_ADDRSTRLEN];
+    int taxaCliente;
 };
 
 
@@ -34,13 +34,13 @@ int pegarIdCliente(char nome[]);
 int carregarClientes();
 int logar(char nome[], char senha[]);
 void finalizarSessao();
-int opLs(int cliente, int port, char ipCliente[], int passiveMode, char pasta[],float maxTaxa);
+int opLs(int cliente, int port, char ipCliente[], int passiveMode, char pasta[],int maxTaxa);
 int opPasv(int cliente, int porta, char ipCliente[]);
 void opQuit(int cliente, int idCliente, char ipCliente[]);
 int opCwd(int cliente, int status, char pasta[]);
 char* opCwdPonto(int cliente, char pasta[]);
-int opPut(int cliente, char nomeArquivo[], char ipCliente[], int port, int passiveMode,float maxTaxa);
-int opGet(int cliente, char ipCliente[], int port, char nomeArquivo[], int passiveMode,float *maxTaxa);
+int opPut(int cliente, char nomeArquivo[], char ipCliente[], int port, int passiveMode,int maxTaxa);
+int opGet(int cliente, char ipCliente[], int port, char nomeArquivo[], int passiveMode,int *maxTaxa);
 int opPwd(int cliente, char endereco[]);
 int opRmd(int cliente, char pasta[]);
 int opMkd(int cliente, char pasta[]);
@@ -57,6 +57,9 @@ char* rPasta(char pasta[]);
 char* aPasta(char pasta[], char newPasta[]);
 int contarPastas(char pasta[]);
 char* verificarString(char pasta[]);
+int adicionarArquivo(int taxa, char ip[]);
+int lerArquivoTaxas();
+int verificaIp(char ip[]);
 //-------------------
 // INTERNAS
 void encontrarComando(char msg[]);
@@ -66,15 +69,19 @@ int entraPasta(char nomePasta[]);
 int finalizarConexao();
 void loopErro();
 void *inicioThread(void *argumentos);
-int server(float maxTaxa);
+int server(int maxTaxa);
 void *controlarTaxas();
 //-------------------
 
 // gerenciamento de numero de pastas
-float taxaSetada;
-float taxaPorCliente;
-float nClientesAtivos=0;
+int taxaSetada;
+//int taxaPorCliente;
+int nClientesAtivos=0;
 int controleEscrita=0;
+int taxaUtilizada=0;
+int taxaDisponivel=0;
+int *taxasClientesAtivos;
+int *clientesAtivos;
 //---------------------------------
 
 
@@ -88,7 +95,10 @@ struct sockaddr_in client;
 int addrlen;
 char *myIp;
 
-int server(float maxTaxa){
+
+
+
+int server(int maxTaxa){
     pthread_t *t=NULL, *controleTaxa;
     int nThreadsOn=1;
     struct argumentos args;
@@ -109,8 +119,11 @@ int server(float maxTaxa){
     char senhaCliente[15], usernameCliente[15];
     int statusFinalizar, statusPastaRaiz;
     int nThreadCriadas=1, threadDisp;
+    int taxaCliente;
 
-    taxaSetada = maxTaxa;
+    taxaSetada = maxTaxa;            // recebe os valores de taxas
+    taxaDisponivel = maxTaxa;         // recebe os valores de taxas
+
 
     statusPastaRaiz = chdir("pastasClientes");
     if(statusPastaRaiz != 0){
@@ -122,12 +135,13 @@ int server(float maxTaxa){
 
 
     statusClientes = carregarClientes();
-    pthread_create(&controleTaxa, NULL, controlarTaxas, NULL);
+    //pthread_create(&controleTaxa, NULL, controlarTaxas, NULL);
 
     if(statusClientes == 0){
         printf("Erro ao carregar clientes\n");
         return 0;
     }
+
 
     s = socket(AF_INET, SOCK_STREAM, 0);
     bzero(&self, sizeof(self));
@@ -152,33 +166,50 @@ int server(float maxTaxa){
         //--------------------
         printf("Ip Cliente: %s\n", ipCliente);
         printf("Conexão solicitada\n");
-        args.idCliente = idCliente;
-        args.cliente = client_s;
-        args.passiveMode = passiveMode;
-        args.statusLogin = statusLogin;
-        strcpy(args.ipCliente, ipCliente);
-        if(t == NULL){
-            t = malloc(sizeof(pthread_t));
-            controleThread = malloc(sizeof(int));
-            threadDisp=0;
+        taxaCliente = verificaIp(ipCliente);
+        if(taxaCliente == 0){       // cliente não encontrado, gerar valor aleatório
+            srand((unsigned)time(NULL));
+            taxaCliente = rand() % (maxTaxa/2);
+            adicionarArquivo(taxaCliente, ipCliente);
         }
-        else{
-            threadDisp = buscarThread(controleThread, nThreadCriadas);
-            if(threadDisp == -1){
-                t = realloc(t, sizeof(pthread_t)*nThreadsOn);
-                controleThread = realloc(controleThread, sizeof(int)*nThreadCriadas+1);
-                threadDisp = nThreadCriadas;
-                nThreadCriadas++;
-            }
-        }
-        args.posicaoControle = threadDisp;
-        //strcpy(ip[threadDisp].ipCliente, ipCliente);
-        if((pthread_create(&t[threadDisp], NULL, inicioThread, (void *)&args) == 0)){
-            controleThread[threadDisp] = 1;
-            nThreadsOn++;
+        printf("Taxa de transferencia do cliente %s setada para %i\n", ipCliente, taxaCliente);
+        if(taxaCliente > taxaDisponivel){
+            printf("Cliente %s impedido de se conectar: excesso de clientes\n");
+            strcpy(msgEnviar, "421 Impossivel conectar-se: excesso de clientes online\n");
+            write(client_s, msgEnviar, strlen(msgEnviar)+1);
         }else{
-            printf("Erro ao criar threads!\n");
-            loopErro();
+            taxaDisponivel = taxaDisponivel - taxaCliente;
+            printf("Taxa cliente: %i\n", taxaCliente);
+            printf("Taxa disponivel: %i\n", taxaDisponivel);
+            args.idCliente = idCliente;
+            args.cliente = client_s;
+            args.passiveMode = passiveMode;
+            args.statusLogin = statusLogin;
+            args.taxaCliente = taxaCliente;
+            strcpy(args.ipCliente, ipCliente);
+            if(t == NULL){
+                t = malloc(sizeof(pthread_t));
+                controleThread = malloc(sizeof(int));
+                threadDisp=0;
+            }
+            else{
+                threadDisp = buscarThread(controleThread, nThreadCriadas);
+                if(threadDisp == -1){
+                    t = realloc(t, sizeof(pthread_t)*nThreadsOn);
+                    controleThread = realloc(controleThread, sizeof(int)*nThreadCriadas+1);
+                    threadDisp = nThreadCriadas;
+                    nThreadCriadas++;
+                }
+            }
+            args.posicaoControle = threadDisp;
+            //strcpy(ip[threadDisp].ipCliente, ipCliente);
+            if((pthread_create(&t[threadDisp], NULL, inicioThread, (void *)&args) == 0)){
+                controleThread[threadDisp] = 1;
+                nThreadsOn++;
+            }else{
+                printf("Erro ao criar threads!\n");
+                loopErro();
+            }
         }
         //strcpy(msgEnviar, "220 Servico pronto\n");
         //write(client_s, msgEnviar, strlen(msgEnviar)+1);
@@ -197,12 +228,10 @@ void *inicioThread(void *argumentos){
     strcpy(msgEnvia, "220 Servico pronto\n");
     write(args->cliente, msgEnvia, strlen(msgEnvia));
     printf("THREAD criando thread para cliente IP %s\n", intIpCliente);
-    conversa(args->cliente, args->idCliente, args->posicaoControle, args->passiveMode, args->statusLogin, intIpCliente);
+    conversa(args->cliente, args->idCliente, args->posicaoControle, args->passiveMode, args->statusLogin, intIpCliente, args->taxaCliente);
 }
-
+/*
 void *controlarTaxas(){
-    float lastClientesAtivos = nClientesAtivos;
-    taxaPorCliente = taxaSetada;
     printf("Thread de controle iniciada!\n");
     while(1){
         if(nClientesAtivos != 0)
@@ -217,13 +246,13 @@ void *controlarTaxas(){
             }
 
         }
-        //printf("Taxa: %.2f\n", taxaPorCliente);
+        //printf("Taxa: %i\n", taxaPorCliente);
         sleep(1);
     }
 
 }
-
-void conversa(int cliente, int idCliente, int numThread, int passiveMode, int statusLogin, char ipCliente[]){
+*/
+void conversa(int cliente, int idCliente, int numThread, int passiveMode, int statusLogin, char ipCliente[], int taxaPorCliente){
     int op = 88;
     int status;
     int i, j;
@@ -245,7 +274,7 @@ void conversa(int cliente, int idCliente, int numThread, int passiveMode, int st
     do{
         printf("------------\n");
         // ---------------------------------
-        printf("Taxa de transferencia por cliente: %.2f bytes/seg\n", taxaPorCliente);
+        printf("Taxa de transferencia por cliente: %i bytes/seg\n", taxaPorCliente);
         // ---------------------------------
         printf("ipCliente: %s\n", ipCliente);
 
@@ -442,6 +471,7 @@ void conversa(int cliente, int idCliente, int numThread, int passiveMode, int st
     controleThread[numThread] = 0;
     // -------------------------------
     while(controleEscrita != 0){}         // aguarda qualquer outra função acabar de escrever
+    taxaDisponivel = taxaDisponivel + taxaPorCliente;     // avisa ao servidor que a taxa está disponível para ser utilizada
     controleEscrita = 1;                  // diz que irá começar a escrveer
     nClientesAtivos--;                    // atualiza o valor
     controleEscrita=0;                    // diz qeu acabou de escrever

@@ -10,7 +10,7 @@
 #include "getMyIp.c"
 #include "pastas.c"
 #include "help.c"
-
+#include "gerencia.c"
 
 // MAIN.c
 int main(int argc, char **argv);
@@ -22,17 +22,17 @@ int logar(char nome[], char senha[]);
 int pegarIdCliente(char nome[]);
 //--------------------------
 // SERVER.C
-int server(float maxTaxa);
+int server(int maxTaxa);
 int opUser(int cliente, char usernameCliente[]);
 void loopErro();
 //--------------------------
 // FUNC.C
-int opLs(int cliente, int port, char ipCliente[], int passiveMode, char pasta[],float maxTaxa);
+int opLs(int cliente, int port, char ipCliente[], int passiveMode, char pasta[],int maxTaxa);
 void opQuit(int cliente, int idCliente, char ipCliente[]);
 int opCwd(int cliente, int status, char pasta[]);
 char* opCwdPonto(int cliente, char pasta[]);
-int opPut(int cliente, char nomeArquivo[], char ipCliente[], int port, int passiveMode,float maxTaxa);
-int opGet(int cliente, char ipCliente[], int port, char nomeArquivo[], int passiveMode,float *maxTaxa);
+int opPut(int cliente, char nomeArquivo[], char ipCliente[], int port, int passiveMode,int maxTaxa);
+int opGet(int cliente, char ipCliente[], int port, char nomeArquivo[], int passiveMode,int *maxTaxa);
 int opPwd(int cliente, char endereco[]);
 int opRmd(int cliente, char pasta[]);
 int opMkd(int cliente, char pasta[]);
@@ -72,4 +72,10 @@ void ajuda();
 //--------------------------
 // ARQUIVO.C
 void arquivo(char maxTaxaS[]);
-float lerArquivo();
+int lerArquivo();
+//--------------------------
+// GERENCIA.C
+int adicionarArquivo(int taxa, char ip[]);
+int lerArquivoTaxas();
+int verificaIp(char ip[]);
+//--------------------------

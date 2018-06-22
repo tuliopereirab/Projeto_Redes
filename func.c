@@ -124,7 +124,7 @@ int opPort(char portas[]){
     return port;
 }
 
-int opLs(int cliente, int port, char ipCliente[], int passiveMode, char pasta[], float maxTaxa){
+int opLs(int cliente, int port, char ipCliente[], int passiveMode, char pasta[], int maxTaxa){
     printf("LIST solicitado\n");
     DIR *dir;
     struct dirent *lsdir;
@@ -327,7 +327,7 @@ char* opCwdPonto(int cliente, char pasta[]){
     }*/
 }
 
-int opPut(int cliente, char nomeArquivo[], char ipCliente[], int port, int passiveMode, float maxTaxa){
+int opPut(int cliente, char nomeArquivo[], char ipCliente[], int port, int passiveMode, int maxTaxa){
     printf("PUT aguardando arquivo\n");
     int dataCon;
     int tamanho, fileh, i, j, z;
@@ -386,18 +386,20 @@ int opPut(int cliente, char nomeArquivo[], char ipCliente[], int port, int passi
     int n;
     i=1;
     while(1){
-        n = read(dataCon, vet[i-1].byte, 8);
+        n = read(dataCon, vet[i-1].byte, maxTaxa);
+        printf("Recebeu %i bytes\n", n);
         //printf("Leu: %s\n", vet[i-1].byte);
         if(n <= 0 || n == -1)
             break;
         i++;
         vet = realloc(vet, sizeof(struct vetChar)*i);
+        //sleep(1);
     }
     printf("Recebeu!\n");
     tamArq = 8*(i-1);
     fileh = open(nomeArquivo, O_CREAT | O_EXCL | O_WRONLY, 0666);
     for(i=0; i<tamArq; i++){
-        write(fileh, vet[i].byte, sizeof(char), 0);
+        write(fileh, vet[i].byte, sizeof(char)*8, 0);
     }
     close(fileh);
     /*read(dataCon, temp, sizeof(char)*8);
@@ -428,7 +430,7 @@ int opPut(int cliente, char nomeArquivo[], char ipCliente[], int port, int passi
     return 1;
 }
 
-int opGet(int cliente, char ipCliente[], int port, char nomeArquivo[], int passiveMode, float *maxTaxa){
+int opGet(int cliente, char ipCliente[], int port, char nomeArquivo[], int passiveMode, int *maxTaxa){
     printf("GET solicitado\n");
     char msgEnvia[100];
     struct stat obj;
