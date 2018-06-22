@@ -34,13 +34,13 @@ int pegarIdCliente(char nome[]);
 int carregarClientes();
 int logar(char nome[], char senha[]);
 void finalizarSessao();
-int opLs(int cliente, int port, char ipCliente[], int passiveMode, char pasta[]);
+int opLs(int cliente, int port, char ipCliente[], int passiveMode, char pasta[],float maxTaxa);
 int opPasv(int cliente, int porta, char ipCliente[]);
 void opQuit(int cliente, int idCliente, char ipCliente[]);
 int opCwd(int cliente, int status, char pasta[]);
 char* opCwdPonto(int cliente, char pasta[]);
-int opPut(int cliente, char nomeArquivo[], char ipCliente[], int port, int passiveMode);
-int opGet(int cliente, char ipCliente[], int port, char nomeArquivo[], int passiveMode);
+int opPut(int cliente, char nomeArquivo[], char ipCliente[], int port, int passiveMode,float maxTaxa);
+int opGet(int cliente, char ipCliente[], int port, char nomeArquivo[], int passiveMode,float *maxTaxa);
 int opPwd(int cliente, char endereco[]);
 int opRmd(int cliente, char pasta[]);
 int opMkd(int cliente, char pasta[]);
@@ -207,7 +207,7 @@ void *controlarTaxas(){
     while(1){
         if(nClientesAtivos != 0)
             if(nClientesAtivos != lastClientesAtivos){
-                taxaPorCliente = taxaSetada/nClientesAtivos;
+                taxaPorCliente = (taxaSetada/nClientesAtivos);
                 lastClientesAtivos = nClientesAtivos;
             }
         else{
@@ -245,7 +245,7 @@ void conversa(int cliente, int idCliente, int numThread, int passiveMode, int st
     do{
         printf("------------\n");
         // ---------------------------------
-        printf("Taxa de transferencia por cliente: %.2f\n", taxaPorCliente);
+        printf("Taxa de transferencia por cliente: %.2f bytes/seg\n", taxaPorCliente);
         // ---------------------------------
         printf("ipCliente: %s\n", ipCliente);
 
@@ -306,7 +306,7 @@ void conversa(int cliente, int idCliente, int numThread, int passiveMode, int st
             case 1:
                 statusPasta = vPasta(pastaAtual);
                 if(statusPasta == 0){
-                    status = opLs(cliente, port, ipCliente, passiveMode, pastaAtual);
+                    status = opLs(cliente, port, ipCliente, passiveMode, pastaAtual, taxaPorCliente);
                 }else{
                     printf("LIST pasta invalida, impossível continuar executando este cliente\n");
                     strcpy(msgEnvia, "450 erro ao acessar a pasta, recomendavel utilizar 'quit' e conectar novamente.\n");
@@ -350,7 +350,7 @@ void conversa(int cliente, int idCliente, int numThread, int passiveMode, int st
                 if(statusPasta == 0){
                     auxPasta = aPasta(pastaAtual, parametro);
 
-                    status = opPut(cliente, parametro, ipCliente, port, passiveMode);
+                    status = opPut(cliente, parametro, ipCliente, port, passiveMode, taxaPorCliente);
                 }else{
                     printf("PUT pasta invalida, impossível continuar executando este cliente\n");
                     strcpy(msgEnvia, "450 erro ao acessar a pasta\n");
@@ -361,7 +361,7 @@ void conversa(int cliente, int idCliente, int numThread, int passiveMode, int st
                 statusPasta = vPasta(pastaAtual);
                 if(statusPasta == 0){
                     auxPasta = aPasta(pastaAtual, parametro);
-                    status = opGet(cliente, ipCliente, port, auxPasta, passiveMode);
+                    status = opGet(cliente, ipCliente, port, auxPasta, passiveMode, &taxaPorCliente);
                 }else{
                     printf("GET pasta invalida, impossível continuar executando este cliente\n");
                     strcpy(msgEnvia, "450 erro ao acessar a pasta\n");

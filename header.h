@@ -27,12 +27,12 @@ int opUser(int cliente, char usernameCliente[]);
 void loopErro();
 //--------------------------
 // FUNC.C
-int opLs(int cliente, int port, char ipCliente[], int passiveMode, char pasta[]);
+int opLs(int cliente, int port, char ipCliente[], int passiveMode, char pasta[],float maxTaxa);
 void opQuit(int cliente, int idCliente, char ipCliente[]);
 int opCwd(int cliente, int status, char pasta[]);
 char* opCwdPonto(int cliente, char pasta[]);
-int opPut(int cliente, char nomeArquivo[], char ipCliente[], int port, int passiveMode);
-int opGet(int cliente, char ipCliente[], int port, char nomeArquivo[], int passiveMode);
+int opPut(int cliente, char nomeArquivo[], char ipCliente[], int port, int passiveMode,float maxTaxa);
+int opGet(int cliente, char ipCliente[], int port, char nomeArquivo[], int passiveMode,float *maxTaxa);
 int opPwd(int cliente, char endereco[]);
 int opRmd(int cliente, char pasta[]);
 int opMkd(int cliente, char pasta[]);

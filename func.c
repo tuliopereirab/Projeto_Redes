@@ -124,7 +124,7 @@ int opPort(char portas[]){
     return port;
 }
 
-int opLs(int cliente, int port, char ipCliente[], int passiveMode, char pasta[]){
+int opLs(int cliente, int port, char ipCliente[], int passiveMode, char pasta[], float maxTaxa){
     printf("LIST solicitado\n");
     DIR *dir;
     struct dirent *lsdir;
@@ -327,7 +327,7 @@ char* opCwdPonto(int cliente, char pasta[]){
     }*/
 }
 
-int opPut(int cliente, char nomeArquivo[], char ipCliente[], int port, int passiveMode){
+int opPut(int cliente, char nomeArquivo[], char ipCliente[], int port, int passiveMode, float maxTaxa){
     printf("PUT aguardando arquivo\n");
     int dataCon;
     int tamanho, fileh, i, j, z;
@@ -428,7 +428,7 @@ int opPut(int cliente, char nomeArquivo[], char ipCliente[], int port, int passi
     return 1;
 }
 
-int opGet(int cliente, char ipCliente[], int port, char nomeArquivo[], int passiveMode){
+int opGet(int cliente, char ipCliente[], int port, char nomeArquivo[], int passiveMode, float *maxTaxa){
     printf("GET solicitado\n");
     char msgEnvia[100];
     struct stat obj;
@@ -477,12 +477,21 @@ int opGet(int cliente, char ipCliente[], int port, char nomeArquivo[], int passi
     if(arquivo == 1)
         tamanho = 0;
     //write(dataCon, &tamanho, sizeof(int));
-    if(tamanho){
+    int sent_bytes = 0;
+    int offset = 0;
+    /*if(tamanho){
         sendfile(dataCon, arquivo, NULL, tamanho);
+    }*/
+    //printf("Bytes enviados: %i\n", sent_bytes);
+    printf("GET enviando a taxa de %.2f Bytes por segundo\n", *maxTaxa);
+    while((sent_bytes = sendfile(dataCon, arquivo, NULL, *maxTaxa)) > 0){
+        printf("Bytes enviados: %i\n", sent_bytes);
+        printf("Enviou");
+        sleep(1);
     }
     /*
     tamanho = strlen(arquivo);
-    int maxTaxa = 10;
+
     i=0;
 
     while(i < tamanho){
