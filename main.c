@@ -36,6 +36,14 @@ int main(int argc, char **argv){
             }
         else if(((strcmp(argv[1], "-h")) == 0) || ((strcmp(argv[1], "--help")) == 0))
             ajuda();
+        else if(((strcmp(argv[1], "-ai")) == 0) || ((strcmp(argv[1], "--addip")) == 0))
+            if(argc == 4){
+                adicionarArquivo(atoi(argv[2]), argv[3]);
+            }
+            else{
+                printf("Erro ao salvar arquivo, por favor utilize './Server -h' ou './Server --help' para receber ajuda.\n");
+                return 0;
+            }
     }
     return 0;
 }

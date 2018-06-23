@@ -28,6 +28,7 @@ int adicionarArquivo(int taxa, char ip[]);
 int lerArquivoTaxas();
 int verificaIp(char ip[]);
 void escreverNoArquivo();
+int returnId(char ip[]);
 //void quebrarIp(char ipCliente[]);
 char* ipVar(char ip[]);
 // GLOBAIS
@@ -52,27 +53,36 @@ int main(){
 int adicionarArquivo(int taxa, char ip[]){
     int i;
     char *valIp;
-    numIps++;
-    if(numIps == 1)
-        clientes = (struct _cliente*)malloc(sizeof(struct _cliente));
-    else
-        clientes = realloc(clientes, sizeof(struct _cliente)*numIps);
-    //quebrarIp(ip);
-    clientes[numIps-1].taxa = taxa;
-    valIp = ipVar(ip);
-    strcpy(clientes[numIps-1].ip, valIp);
-    printf("Mostrar IP Struct: %s\n", clientes[numIps-1].ip);
+    int status = lerArquivoTaxas();
+    status = returnId(ip);
+    if(status == -1){
+        printf("Ip ainda não está na lista, adicionando-o...\n");
+        numIps++;
+        if(numIps == 1)
+            clientes = (struct _cliente*)malloc(sizeof(struct _cliente));
+        else
+            clientes = realloc(clientes, sizeof(struct _cliente)*numIps);
+        //quebrarIp(ip);
+        clientes[numIps-1].taxa = taxa;
+        valIp = ipVar(ip);
+        strcpy(clientes[numIps-1].ip, valIp);
+        //printf("Mostrar IP Struct: %s\n", clientes[numIps-1].ip);
+    }else{
+        printf("Cliente já está na lista, atualizando taxa...\n");
+        clientes[status].taxa = taxa;
+    }
     escreverNoArquivo();
+    printf("Arquivo atualizado com sucesso!\n");
     return 1;
 }
 
 void escreverNoArquivo(){
     FILE *arquivo;
     int i;
-    arquivo = fopen("../gerenciaTaxas", "w+");
+    arquivo = fopen("gerenciaTaxas", "w+");
     fprintf(arquivo, "%i\n", numIps);
     for(i=0;i<numIps; i++){
-        printf("Escrevendo..\t%i\t%s\n", clientes[i].taxa, clientes[i].ip);
+        //printf("Escrevendo..\t%i\t%s\n", clientes[i].taxa, clientes[i].ip);
         fprintf(arquivo, "%i %s", clientes[i].taxa, clientes[i].ip);
         if(i != (numIps-1))
             fprintf(arquivo, "\n");
@@ -100,6 +110,14 @@ int lerArquivoTaxas(){
     return 1;
 }
 
+int returnId(char ip[]){
+    int i;
+    for(i=0; i<numIps; i++)
+        if((strcmp(ip, clientes[i].ip)) == 0)
+            return i;
+    return -1;
+}
+
 
 int verificaIp(char ip[]){
     int i;
@@ -107,5 +125,5 @@ int verificaIp(char ip[]){
         if((strcmp(ip, clientes[i].ip)) == 0)
             return clientes[i].taxa;
     }
-    return -1;
+    return -1;         // ip não está na lista
 }
