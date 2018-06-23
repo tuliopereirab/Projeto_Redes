@@ -331,7 +331,7 @@ char* opCwdPonto(int cliente, char pasta[]){
     }*/
 }
 
-int opPut(int cliente, char nomeArquivo[], char ipCliente[], int port, int passiveMode, int maxTaxa){
+int opPut(int cliente, char nomeArquivo[], char ipCliente[], int port, int passiveMode, int *maxTaxa){
     printf("PUT aguardando arquivo\n");
     int dataCon;
     int tamanho, fileh, i, j, z;
@@ -386,6 +386,7 @@ int opPut(int cliente, char nomeArquivo[], char ipCliente[], int port, int passi
     close(fileh);*/
     //read(cliente, &tamanho, sizeof(int));
     //arquivo = malloc(sizeof(char)*8);
+    /*
     vet = malloc(sizeof(struct vetChar));
     int n;
     i=1;
@@ -428,6 +429,23 @@ int opPut(int cliente, char nomeArquivo[], char ipCliente[], int port, int passi
     /*fileh = open(nomeArquivo, O_CREAT | O_EXCL | O_WRONLY, 0666);
     write(fileh, arquivo, tamanho, 0);
     close(fileh);*/
+
+    FILE *received_file;
+    received_file = fopen(nomeArquivo, "w+");
+    int len, tam = *maxTaxa;
+    printf("TAMANHO: %i\n", tam);
+    char *buffer;
+    buffer = (char*)malloc(sizeof(char)*tam);
+    printf("Iniciando recebimento!\n");
+    while((len=recv(dataCon, buffer, *maxTaxa, 0) > 0)){
+        printf("Recebeu!\n");
+        fwrite(buffer, sizeof(char), len, received_file);
+        printf("Receive %i bytes\n", len);
+        sleep(1);
+    }
+    fclose(received_file);
+    close(dataCon);
+
     strcpy(msgEnvia, "250 arquivo recebido\n");
     write(cliente, msgEnvia, strlen(msgEnvia)+1);
     printf("PUT arquivo recebido\n");

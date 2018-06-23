@@ -48,7 +48,7 @@ int opPasv(int cliente, int porta, char ipCliente[]);
 void opQuit(int cliente, int idCliente, char ipCliente[]);
 int opCwd(int cliente, int status, char pasta[]);
 char* opCwdPonto(int cliente, char pasta[]);
-int opPut(int cliente, char nomeArquivo[], char ipCliente[], int port, int passiveMode,int maxTaxa);
+int opPut(int cliente, char nomeArquivo[], char ipCliente[], int port, int passiveMode,int *maxTaxa);
 int opGet(int cliente, char ipCliente[], int port, char nomeArquivo[], int passiveMode,int *maxTaxa);
 int opPwd(int cliente, char endereco[]);
 int opRmd(int cliente, char pasta[]);
@@ -399,7 +399,7 @@ void conversa(int cliente, int idCliente, int numThread, int passiveMode, int st
                         controleEscritaStruct = 0;       // indica que acabou de escrever na struct
                         controleAtualiza = 0;         // indica que precisa de uma atualização da taxa de envio atual
                         while(controleAtualiza == 0) {}       // aguarda enquanto a thread de atualização não atualiza o valor de taxa atual
-                        status = opPut(cliente, parametro, ipCliente, port, passiveMode, &controleTaxas[idTaxa].taxaAtual);
+                        status = opPut(cliente, auxPasta, ipCliente, port, passiveMode, &controleTaxas[idTaxa].taxaAtual);
                         while(controleEscritaStruct != 0){}
                         controleEscritaStruct = 1;
                         controleTaxas[idTaxa].cOnline--;
@@ -418,7 +418,7 @@ void conversa(int cliente, int idCliente, int numThread, int passiveMode, int st
                             controleEscritaStruct = 0;
                             controleAtualiza = 0;
                             while(controleAtualiza == 0) {}
-                            status = opPut(cliente, parametro, ipCliente, port, passiveMode, &controleTaxas[idTaxa].taxaAtual);
+                            status = opPut(cliente, auxPasta, ipCliente, port, passiveMode, &controleTaxas[idTaxa].taxaAtual);
                             while(controleEscritaStruct != 0) {}
                             controleEscritaStruct = 1;
                             controleTaxas[idTaxa].cOnline--;
