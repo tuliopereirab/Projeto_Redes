@@ -54,6 +54,7 @@ char* readFileBytes(const char *name);
 char* correcaoPort(char aux[]);
 int buscarThread(int controle[], int nThreads);
 char* ipVar(char ip[]);
+char* ipVarPasv(char ip[]);
 //--------------------------
 // GETMYIP.C
 char* getMyIp();

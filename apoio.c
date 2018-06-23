@@ -4,6 +4,7 @@
 #include <string.h>
 
 char valIp[100];
+char valIpPasv[100];
 
 char* readFileBytes(const char *name)    // Link de referencia da função está no arquivo de Links
 {
@@ -44,4 +45,17 @@ char* ipVar(char ip[]){
         i++;
     }
     return valIp;
+}
+
+char* ipVarPasv(char ip[]){
+    int i=0, tam;
+    tam = strlen(ip);
+    while(ip[i]!= '\0'){
+        if(ip[i] == '.')
+            valIpPasv[i] = ',';
+        else
+            valIpPasv[i] = ip[i];
+        i++;
+    }
+    return valIpPasv;
 }

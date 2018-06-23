@@ -100,6 +100,8 @@ int *clientesAtivos;
 int *idsClientesAtivos;
 struct _taxas *controleTaxas = NULL;
 int valIps=0;
+int controleAtualiza = 1;
+int controleEscritaStruct = 0;
 //---------------------------------
 
 
@@ -254,6 +256,8 @@ void *controlarTaxas(){
                 }
 
         }
+        controleAtualiza = 1;
+        //printf("Atualizou!\n");
         sleep(1);
     }
 
@@ -386,12 +390,52 @@ void conversa(int cliente, int idCliente, int numThread, int passiveMode, int st
                 break;
             case 10:
                 statusPasta = vPasta(pastaAtual);
-
                 if(statusPasta == 0){
                     auxPasta = aPasta(pastaAtual, parametro);
-                    controleTaxas[idTaxa].cOnline++;
-                    status = opPut(cliente, parametro, ipCliente, port, passiveMode, &controleTaxas[idTaxa].taxaAtual);
-                    controleTaxas[idTaxa].cOnline--;
+                    if(controleTaxas[idTaxa].cOnline != 0){
+                        while(controleEscritaStruct != 0){}
+                        controleEscritaStruct = 1;       // indica que comecou a escreve na struct
+                        controleTaxas[idTaxa].cOnline++;    // escreveu na struct
+                        controleEscritaStruct = 0;       // indica que acabou de escrever na struct
+                        controleAtualiza = 0;         // indica que precisa de uma atualização da taxa de envio atual
+                        while(controleAtualiza == 0) {}       // aguarda enquanto a thread de atualização não atualiza o valor de taxa atual
+                        status = opPut(cliente, parametro, ipCliente, port, passiveMode, &controleTaxas[idTaxa].taxaAtual);
+                        while(controleEscritaStruct != 0){}
+                        controleEscritaStruct = 1;
+                        controleTaxas[idTaxa].cOnline--;
+                        controleEscritaStruct = 0;
+                    }else{
+                        if(controleTaxas[idTaxa].maxTaxa <= taxaDisponivel){
+                            while(controleEscrita != 0) {}
+                            controleEscrita = 1;
+                            taxaDisponivel = taxaDisponivel - controleTaxas[idTaxa].maxTaxa;
+                            printf("Atualizou Taxa disponivel 1: %i\n", taxaDisponivel);
+                            controleEscrita = 0;
+                            printf("Taxa disponivel: %i\n", taxaDisponivel);
+                            while(controleEscritaStruct != 0){}
+                            controleEscritaStruct = 1;
+                            controleTaxas[idTaxa].cOnline++;
+                            controleEscritaStruct = 0;
+                            controleAtualiza = 0;
+                            while(controleAtualiza == 0) {}
+                            status = opPut(cliente, parametro, ipCliente, port, passiveMode, &controleTaxas[idTaxa].taxaAtual);
+                            while(controleEscritaStruct != 0) {}
+                            controleEscritaStruct = 1;
+                            controleTaxas[idTaxa].cOnline--;
+                            controleEscritaStruct = 0;
+                            if(controleTaxas[idTaxa].cOnline == 0){
+                                while(controleEscrita != 0) {}
+                                controleEscrita = 1;
+                                taxaDisponivel = taxaDisponivel + controleTaxas[idTaxa].maxTaxa;
+                                printf("Atualizou Taxa disponivel 2: %i\n", taxaDisponivel);
+                                controleEscrita = 0;
+                            }
+                        }else{
+                            printf("GET largura de banda do servidor excedida, get cancelado.\n");
+                            strcpy(msgEnvia, "450 largura de banda do servidor excedida, GET cancelado.\n");
+                            write(cliente, msgEnvia, strlen(msgEnvia)+1);
+                        }
+                    }
                 }else{
                     printf("PUT pasta invalida, impossível continuar executando este cliente\n");
                     strcpy(msgEnvia, "450 erro ao acessar a pasta\n");
@@ -400,14 +444,52 @@ void conversa(int cliente, int idCliente, int numThread, int passiveMode, int st
                 break;
             case 11:
                 statusPasta = vPasta(pastaAtual);
-
                 if(statusPasta == 0){
                     auxPasta = aPasta(pastaAtual, parametro);
-                    controleTaxas[idTaxa].cOnline++;
-                    while(controleEscrita != 0) {}
-                    controleEscrita = 1;
-                    status = opGet(cliente, ipCliente, port, auxPasta, passiveMode, &controleTaxas[idTaxa].taxaAtual);
-                    controleTaxas[idTaxa].cOnline--;
+                    if(controleTaxas[idTaxa].cOnline != 0){
+                        while(controleEscritaStruct != 0){}
+                        controleEscritaStruct = 1;       // indica que comecou a escreve na struct
+                        controleTaxas[idTaxa].cOnline++;    // escreveu na struct
+                        controleEscritaStruct = 0;       // indica que acabou de escrever na struct
+                        controleAtualiza = 0;         // indica que precisa de uma atualização da taxa de envio atual
+                        while(controleAtualiza == 0) {}       // aguarda enquanto a thread de atualização não atualiza o valor de taxa atual
+                        status = opGet(cliente, ipCliente, port, auxPasta, passiveMode, &controleTaxas[idTaxa].taxaAtual);
+                        while(controleEscritaStruct != 0){}
+                        controleEscritaStruct = 1;
+                        controleTaxas[idTaxa].cOnline--;
+                        controleEscritaStruct = 0;
+                    }else{
+                        if(controleTaxas[idTaxa].maxTaxa <= taxaDisponivel){
+                            while(controleEscrita != 0) {}
+                            controleEscrita = 1;
+                            taxaDisponivel = taxaDisponivel - controleTaxas[idTaxa].maxTaxa;
+                            printf("Atualizou Taxa disponivel 1: %i\n", taxaDisponivel);
+                            controleEscrita = 0;
+                            printf("Taxa disponivel: %i\n", taxaDisponivel);
+                            while(controleEscritaStruct != 0){}
+                            controleEscritaStruct = 1;
+                            controleTaxas[idTaxa].cOnline++;
+                            controleEscritaStruct = 0;
+                            controleAtualiza = 0;
+                            while(controleAtualiza == 0) {}
+                            status = opGet(cliente, ipCliente, port, auxPasta, passiveMode, &controleTaxas[idTaxa].taxaAtual);
+                            while(controleEscritaStruct != 0) {}
+                            controleEscritaStruct = 1;
+                            controleTaxas[idTaxa].cOnline--;
+                            controleEscritaStruct = 0;
+                            if(controleTaxas[idTaxa].cOnline == 0){
+                                while(controleEscrita != 0) {}
+                                controleEscrita = 1;
+                                taxaDisponivel = taxaDisponivel + controleTaxas[idTaxa].maxTaxa;
+                                printf("Atualizou Taxa disponivel 2: %i\n", taxaDisponivel);
+                                controleEscrita = 0;
+                            }
+                        }else{
+                            printf("GET largura de banda do servidor excedida, get cancelado.\n");
+                            strcpy(msgEnvia, "450 largura de banda do servidor excedida, GET cancelado.\n");
+                            write(cliente, msgEnvia, strlen(msgEnvia)+1);
+                        }
+                    }
                 }else{
                     printf("GET pasta invalida, impossível continuar executando este cliente\n");
                     strcpy(msgEnvia, "450 erro ao acessar a pasta\n");
@@ -487,11 +569,11 @@ void conversa(int cliente, int idCliente, int numThread, int passiveMode, int st
     }while(op != 99);
     controleThread[numThread] = 0;
     // -------------------------------
-    while(controleEscrita != 0){}         // aguarda qualquer outra função acabar de escrever
-    taxaDisponivel = taxaDisponivel + taxaPorCliente;     // avisa ao servidor que a taxa está disponível para ser utilizada
-    controleEscrita = 1;                  // diz que irá começar a escrveer
+    //while(controleEscrita != 0){}         // aguarda qualquer outra função acabar de escrever
+    //taxaDisponivel = taxaDisponivel + taxaPorCliente;     // avisa ao servidor que a taxa está disponível para ser utilizada
+    //controleEscrita = 1;                  // diz que irá começar a escrveer
     nClientesAtivos--;                    // atualiza o valor
-    controleEscrita=0;                    // diz qeu acabou de escrever
+    //controleEscrita=0;                    // diz qeu acabou de escrever
     //-----------------------------------
     system(EXIT_SUCCESS);
 }

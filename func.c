@@ -42,6 +42,7 @@ char* aPasta(char pasta[], char newPasta[]);
 int contarPastas(char pasta[]);
 void conexaoModoPassivo(int port);
 int retornarDataCon();
+char* ipVarPasv(char ip[]);
 
 void opQuit(int cliente, int idCliente, char ipCliente[]){
     int statusFinalizar;
@@ -195,6 +196,7 @@ int opPasv(int cliente, int porta, char ipCliente[]){
     struct argus *args;
     pthread_t t;
     int dataCon;
+    char* ipEnvia;
     while(port < 1023)
         port = rand() % 65000;
     printf("PORTA RANDOMICA: %i\n", port);
@@ -263,16 +265,18 @@ int opPasv(int cliente, int porta, char ipCliente[]){
             h4[i] = '\0';
     }
     //h3[1] = '\0';
-
+    strcpy(ipCliente, "127.0.0.1");
+    ipEnvia = ipVarPasv(ipCliente);
     //printf("h1: %s\nh2: %s\nh3: %s\nh4: %s\np1: %s\np2: %s\n", h1, h2, h3, h4, p1, p2);
     strcpy(msgEnviar, "227 entrando em modo passivo (");
-    strcat(msgEnviar, h1);
+    /*strcat(msgEnviar, h1);
     strcat(msgEnviar, ",");
     strcat(msgEnviar, h2);
     strcat(msgEnviar, ",");
     strcat(msgEnviar, h3);
     strcat(msgEnviar, ",");
-    strcat(msgEnviar, h4);
+    strcat(msgEnviar, h4);*/
+    strcat(msgEnviar, ipEnvia);
     strcat(msgEnviar, ",");
     strcat(msgEnviar, p1);
     strcat(msgEnviar, ",");
@@ -441,7 +445,7 @@ int opGet(int cliente, char ipCliente[], int port, char nomeArquivo[], int passi
     //char *arquivo;
     int nBytes = 0;
 
-
+    //printf("Entrou GET, taxa: %i\n", maxTaxa);
     if(fopen(nomeArquivo, "r+") == NULL){
         strcpy(msgEnvia, "550 Arquivo inexistente\n");
         write(cliente, msgEnvia, strlen(msgEnvia)+1);
