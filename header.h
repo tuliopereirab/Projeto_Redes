@@ -31,7 +31,7 @@ int opLs(int cliente, int port, char ipCliente[], int passiveMode, char pasta[],
 void opQuit(int cliente, int idCliente, char ipCliente[]);
 int opCwd(int cliente, int status, char pasta[]);
 char* opCwdPonto(int cliente, char pasta[]);
-int opPut(int cliente, char nomeArquivo[], char ipCliente[], int port, int passiveMode,int maxTaxa);
+int opPut(int cliente, char nomeArquivo[], char ipCliente[], int port, int passiveMode,int *maxTaxa);
 int opGet(int cliente, char ipCliente[], int port, char nomeArquivo[], int passiveMode,int *maxTaxa);
 int opPwd(int cliente, char endereco[]);
 int opRmd(int cliente, char pasta[]);
