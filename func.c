@@ -42,6 +42,7 @@ char* aPasta(char pasta[], char newPasta[]);
 int contarPastas(char pasta[]);
 void conexaoModoPassivo(int port);
 int retornarDataCon();
+char* ipVarPasv(char ip[]);
 
 void opQuit(int cliente, int idCliente, char ipCliente[]){
     int statusFinalizar;
@@ -124,7 +125,7 @@ int opPort(char portas[]){
     return port;
 }
 
-int opLs(int cliente, int port, char ipCliente[], int passiveMode, char pasta[], int *maxTaxa){
+int opLs(int cliente, int port, char ipCliente[], int passiveMode, char pasta[], int maxTaxa){
     printf("LIST solicitado\n");
     DIR *dir;
     struct dirent *lsdir;
@@ -195,6 +196,7 @@ int opPasv(int cliente, int porta, char ipCliente[]){
     struct argus *args;
     pthread_t t;
     int dataCon;
+    char* ipEnvia;
     while(port < 1023)
         port = rand() % 65000;
     printf("PORTA RANDOMICA: %i\n", port);
@@ -263,16 +265,18 @@ int opPasv(int cliente, int porta, char ipCliente[]){
             h4[i] = '\0';
     }
     //h3[1] = '\0';
-
+    strcpy(ipCliente, "127.0.0.1");
+    ipEnvia = ipVarPasv(ipCliente);
     //printf("h1: %s\nh2: %s\nh3: %s\nh4: %s\np1: %s\np2: %s\n", h1, h2, h3, h4, p1, p2);
     strcpy(msgEnviar, "227 entrando em modo passivo (");
-    strcat(msgEnviar, h1);
+    /*strcat(msgEnviar, h1);
     strcat(msgEnviar, ",");
     strcat(msgEnviar, h2);
     strcat(msgEnviar, ",");
     strcat(msgEnviar, h3);
     strcat(msgEnviar, ",");
-    strcat(msgEnviar, h4);
+    strcat(msgEnviar, h4);*/
+    strcat(msgEnviar, ipEnvia);
     strcat(msgEnviar, ",");
     strcat(msgEnviar, p1);
     strcat(msgEnviar, ",");
@@ -356,7 +360,7 @@ int opPut(int cliente, char nomeArquivo[], char ipCliente[], int port, int passi
         printf("ERRO ao abrir conexao de dados, PUT finalizado\n");
         return 0;
     }
-    printf("Tamanho: %i\n", *maxTaxa);
+
     printf("PUT recebendo arquivo \'%s\'\n", nomeArquivo);
     /*i = 1;
     tamT = read(dataCon, temp, 1);
@@ -382,12 +386,12 @@ int opPut(int cliente, char nomeArquivo[], char ipCliente[], int port, int passi
     close(fileh);*/
     //read(cliente, &tamanho, sizeof(int));
     //arquivo = malloc(sizeof(char)*8);
-    /*vet = malloc(sizeof(struct vetChar));
+    /*
+    vet = malloc(sizeof(struct vetChar));
     int n;
     i=1;
     while(1){
-        //n = read(dataCon, vet[i-1].byte, maxTaxa);
-        n = read(dataCon, arquivo, maxTaxa);
+        n = read(dataCon, vet[i-1].byte, maxTaxa);
         printf("Recebeu %i bytes\n", n);
         //printf("Leu: %s\n", vet[i-1].byte);
         if(n <= 0 || n == -1)
@@ -421,24 +425,27 @@ int opPut(int cliente, char nomeArquivo[], char ipCliente[], int port, int passi
     ioctl(dataCon, FIONREAD, &tamanho);
     read(dataCon, arquivo, tamanho);
     */
-    int len, tam=5;
-    printf("Tam: %i\n", *maxTaxa);
-    char *buffer;
+
+    /*fileh = open(nomeArquivo, O_CREAT | O_EXCL | O_WRONLY, 0666);
+    write(fileh, arquivo, tamanho, 0);
+    close(fileh);*/
+
     FILE *received_file;
     received_file = fopen(nomeArquivo, "w+");
-    buffer = (char*)malloc(sizeof(char)*(tam+1));
-    printf("Comecando a receber\n");
-    while ((len = recv(dataCon, buffer, *maxTaxa, 0)) > 0){
+    int len, tam = *maxTaxa;
+    printf("TAMANHO: %i\n", tam);
+    char *buffer;
+    buffer = (char*)malloc(sizeof(char)*tam);
+    printf("Iniciando recebimento!\n");
+    while((len=recv(dataCon, buffer, *maxTaxa, 0) > 0)){
         printf("Recebeu!\n");
         fwrite(buffer, sizeof(char), len, received_file);
-        fprintf("Receive %d bytes and we hope : %d bytes\n", len);
+        printf("Receive %i bytes\n", len);
+        sleep(1);
     }
     fclose(received_file);
     close(dataCon);
-/*
-    fileh = open(nomeArquivo, O_CREAT | O_EXCL | O_WRONLY, 0666);
-    write(fileh, arquivo, tamanho, 0);
-    close(fileh);*/
+
     strcpy(msgEnvia, "250 arquivo recebido\n");
     write(cliente, msgEnvia, strlen(msgEnvia)+1);
     printf("PUT arquivo recebido\n");
@@ -456,7 +463,7 @@ int opGet(int cliente, char ipCliente[], int port, char nomeArquivo[], int passi
     //char *arquivo;
     int nBytes = 0;
 
-
+    //printf("Entrou GET, taxa: %i\n", maxTaxa);
     if(fopen(nomeArquivo, "r+") == NULL){
         strcpy(msgEnvia, "550 Arquivo inexistente\n");
         write(cliente, msgEnvia, strlen(msgEnvia)+1);

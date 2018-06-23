@@ -27,7 +27,7 @@ int opUser(int cliente, char usernameCliente[]);
 void loopErro();
 //--------------------------
 // FUNC.C
-int opLs(int cliente, int port, char ipCliente[], int passiveMode, char pasta[],int *maxTaxa);
+int opLs(int cliente, int port, char ipCliente[], int passiveMode, char pasta[],int maxTaxa);
 void opQuit(int cliente, int idCliente, char ipCliente[]);
 int opCwd(int cliente, int status, char pasta[]);
 char* opCwdPonto(int cliente, char pasta[]);
@@ -53,6 +53,8 @@ int calcPortPASV(int val, int set);
 char* readFileBytes(const char *name);
 char* correcaoPort(char aux[]);
 int buscarThread(int controle[], int nThreads);
+char* ipVar(char ip[]);
+char* ipVarPasv(char ip[]);
 //--------------------------
 // GETMYIP.C
 char* getMyIp();
