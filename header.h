@@ -53,6 +53,7 @@ int calcPortPASV(int val, int set);
 char* readFileBytes(const char *name);
 char* correcaoPort(char aux[]);
 int buscarThread(int controle[], int nThreads);
+char* ipVar(char ip[]);
 //--------------------------
 // GETMYIP.C
 char* getMyIp();

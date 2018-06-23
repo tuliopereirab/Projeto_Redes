@@ -29,7 +29,7 @@ int lerArquivoTaxas();
 int verificaIp(char ip[]);
 void escreverNoArquivo();
 //void quebrarIp(char ipCliente[]);
-void ipVar(char ip[]);
+char* ipVar(char ip[]);
 // GLOBAIS
 char h1[4];
 char h2[4];
@@ -51,6 +51,7 @@ int main(){
 
 int adicionarArquivo(int taxa, char ip[]){
     int i;
+    char *valIp;
     numIps++;
     if(numIps == 1)
         clientes = (struct _cliente*)malloc(sizeof(struct _cliente));
@@ -58,19 +59,11 @@ int adicionarArquivo(int taxa, char ip[]){
         clientes = realloc(clientes, sizeof(struct _cliente)*numIps);
     //quebrarIp(ip);
     clientes[numIps-1].taxa = taxa;
-    ipVar(ip);
+    valIp = ipVar(ip);
     strcpy(clientes[numIps-1].ip, valIp);
     printf("Mostrar IP Struct: %s\n", clientes[numIps-1].ip);
     escreverNoArquivo();
     return 1;
-}
-void ipVar(char ip[]){
-    int i=0, tam;
-    tam = strlen(ip);
-    while(ip[i]!= '\0'){
-        valIp[i] = ip[i];
-        i++;
-    }
 }
 
 void escreverNoArquivo(){
@@ -114,5 +107,5 @@ int verificaIp(char ip[]){
         if((strcmp(ip, clientes[i].ip)) == 0)
             return clientes[i].taxa;
     }
-    return 0;
+    return -1;
 }

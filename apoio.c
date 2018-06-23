@@ -3,6 +3,7 @@
 #include <ctype.h>
 #include <string.h>
 
+char valIp[100];
 
 char* readFileBytes(const char *name)    // Link de referencia da função está no arquivo de Links
 {
@@ -33,4 +34,14 @@ int buscarThread(int controle[], int nThreads){
         if(controle[i] == 0)
             return i;
     return -1;
+}
+
+char* ipVar(char ip[]){
+    int i=0, tam;
+    tam = strlen(ip);
+    while(ip[i]!= '\0'){
+        valIp[i] = ip[i];
+        i++;
+    }
+    return valIp;
 }
