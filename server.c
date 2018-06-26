@@ -404,6 +404,13 @@ void conversa(int cliente, int idCliente, int numThread, int passiveMode, int st
                         controleEscritaStruct = 1;
                         controleTaxas[idTaxa].cOnline--;
                         controleEscritaStruct = 0;
+                        if(controleTaxas[idTaxa].cOnline == 0){
+                            while(controleEscrita != 0) {}
+                            controleEscrita = 1;
+                            taxaDisponivel = taxaDisponivel + controleTaxas[idTaxa].maxTaxa;
+                            printf("Atualizou Taxa disponivel 2: %i\n", taxaDisponivel);
+                            controleEscrita = 0;
+                        }
                     }else{
                         if(controleTaxas[idTaxa].maxTaxa <= taxaDisponivel){
                             while(controleEscrita != 0) {}
@@ -461,6 +468,13 @@ void conversa(int cliente, int idCliente, int numThread, int passiveMode, int st
                         controleEscritaStruct = 1;
                         controleTaxas[idTaxa].cOnline--;
                         controleEscritaStruct = 0;
+                        if(controleTaxas[idTaxa].cOnline == 0){
+                            while(controleEscrita != 0) {}
+                            controleEscrita = 1;
+                            taxaDisponivel = taxaDisponivel + controleTaxas[idTaxa].maxTaxa;
+                            printf("Atualizou Taxa disponivel 2: %i\n", taxaDisponivel);
+                            controleEscrita = 0;
+                        }
                     }else{
                         if(controleTaxas[idTaxa].maxTaxa <= taxaDisponivel){
                             while(controleEscrita != 0) {}

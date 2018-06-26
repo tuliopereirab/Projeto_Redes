@@ -289,7 +289,7 @@ int opPasv(int cliente, int porta, char ipCliente[]){
     printf("P1: %s\nP2: %s\n", p1, p2);
     //strcat(msgEnviar, "\0");
     //msgEnviar[strlen(msgEnviar)] = '\0';
-    while(returnConData() == 0) {printf("Teste\n");}
+    while(returnConData() == 0) {printf("Aguardando porta de dados estar aberta\n");}
 
     printf("PASV thread esperando conexao!\n");
     printf("MENSAGEM ENVIAR: %s\n", msgEnviar);
@@ -516,7 +516,7 @@ int opGet(int cliente, char ipCliente[], int port, char nomeArquivo[], int passi
         sendfile(dataCon, arquivo, NULL, tamanho);
     }*/
     //printf("Bytes enviados: %i\n", sent_bytes);
-    printf("GET enviando a taxa de %.2f Bytes por segundo\n", *maxTaxa);
+    printf("GET enviando a taxa de %i Bytes por segundo\n", *maxTaxa);
     while((sent_bytes = sendfile(dataCon, arquivo, NULL, *maxTaxa)) > 0){
         printf("Bytes enviados: %i\n", sent_bytes);
         printf("Enviou");
