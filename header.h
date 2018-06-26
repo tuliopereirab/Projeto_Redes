@@ -44,6 +44,7 @@ int iniciarConexaoDados(int cliente, int port, char ipCliente[]);
 void conexaoModoPassivo(int port);
 int retornarDataCon();
 int statusThread();
+int returnConData();
 //--------------------------
 // PORTA.C
 int calcPort(int val1, int val2);

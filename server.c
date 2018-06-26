@@ -252,7 +252,7 @@ void *controlarTaxas(){
                     }else{
                         controleTaxas[i].taxaAtual = 0;
                     }
-                    printf("Taxa atual cliente %s: %i\n", controleTaxas[i].ip, controleTaxas[i].taxaAtual);
+                    //printf("Taxa atual cliente %s: %i\n", controleTaxas[i].ip, controleTaxas[i].taxaAtual);
                 }
 
         }
@@ -444,13 +444,16 @@ void conversa(int cliente, int idCliente, int numThread, int passiveMode, int st
                 break;
             case 11:
                 statusPasta = vPasta(pastaAtual);
+                printf("Teste1\n");
                 if(statusPasta == 0){
                     auxPasta = aPasta(pastaAtual, parametro);
                     if(controleTaxas[idTaxa].cOnline != 0){
+                        printf("Teste2\n");
                         while(controleEscritaStruct != 0){}
                         controleEscritaStruct = 1;       // indica que comecou a escreve na struct
                         controleTaxas[idTaxa].cOnline++;    // escreveu na struct
                         controleEscritaStruct = 0;       // indica que acabou de escrever na struct
+                        printf("Teste3: %i\n", controleTaxas[idTaxa].cOnline);
                         controleAtualiza = 0;         // indica que precisa de uma atualização da taxa de envio atual
                         while(controleAtualiza == 0) {}       // aguarda enquanto a thread de atualização não atualiza o valor de taxa atual
                         status = opGet(cliente, ipCliente, port, auxPasta, passiveMode, &controleTaxas[idTaxa].taxaAtual);
@@ -463,6 +466,7 @@ void conversa(int cliente, int idCliente, int numThread, int passiveMode, int st
                             while(controleEscrita != 0) {}
                             controleEscrita = 1;
                             taxaDisponivel = taxaDisponivel - controleTaxas[idTaxa].maxTaxa;
+                            printf("TaxaDisponivel: %i\n", taxaDisponivel);
                             printf("Atualizou Taxa disponivel 1: %i\n", taxaDisponivel);
                             controleEscrita = 0;
                             printf("Taxa disponivel: %i\n", taxaDisponivel);
@@ -470,6 +474,7 @@ void conversa(int cliente, int idCliente, int numThread, int passiveMode, int st
                             controleEscritaStruct = 1;
                             controleTaxas[idTaxa].cOnline++;
                             controleEscritaStruct = 0;
+                            printf("Teste4: %i\n", controleTaxas[idTaxa].cOnline);
                             controleAtualiza = 0;
                             while(controleAtualiza == 0) {}
                             status = opGet(cliente, ipCliente, port, auxPasta, passiveMode, &controleTaxas[idTaxa].taxaAtual);

@@ -43,6 +43,7 @@ int contarPastas(char pasta[]);
 void conexaoModoPassivo(int port);
 int retornarDataCon();
 char* ipVarPasv(char ip[]);
+int returnConData();
 
 void opQuit(int cliente, int idCliente, char ipCliente[]){
     int statusFinalizar;
@@ -193,16 +194,17 @@ int opPasv(int cliente, int porta, char ipCliente[]){
     int i, j=0, z=0, p1int, p2int;
     char msgEnviar[100];
     int port = 0;
-    struct argus *args;
+    struct argus args;
     pthread_t t;
     int dataCon;
     char* ipEnvia;
+    srand((unsigned)time(NULL));
     while(port < 1023)
         port = rand() % 65000;
     printf("PORTA RANDOMICA: %i\n", port);
     //-------------------------------------------------------------
-    args = malloc(sizeof(struct argus));
-    args->port = port;
+    //args = malloc(sizeof(struct argus));
+    args.port = port;
     pthread_create(&t, NULL, chamadaThreadData, (void *)&args);
     /*if((pthread_create(&t, NULL, chamadaThreadData, (void *)&args)) == 0)){
         printf("PASV erro ao criar thread de conexao de dados!\n");
@@ -268,7 +270,8 @@ int opPasv(int cliente, int porta, char ipCliente[]){
     strcpy(ipCliente, "127.0.0.1");
     ipEnvia = ipVarPasv(ipCliente);
     //printf("h1: %s\nh2: %s\nh3: %s\nh4: %s\np1: %s\np2: %s\n", h1, h2, h3, h4, p1, p2);
-    strcpy(msgEnviar, "227 entrando em modo passivo (");
+    //strcpy(msgEnviar, "227 entrando em modo passivo (");
+    //strcpy(msgEnviar, "227 Entering Passive Mode (");
     /*strcat(msgEnviar, h1);
     strcat(msgEnviar, ",");
     strcat(msgEnviar, h2);
@@ -276,13 +279,18 @@ int opPasv(int cliente, int porta, char ipCliente[]){
     strcat(msgEnviar, h3);
     strcat(msgEnviar, ",");
     strcat(msgEnviar, h4);*/
-    strcat(msgEnviar, ipEnvia);
+    /*strcat(msgEnviar, ipEnvia);
     strcat(msgEnviar, ",");
     strcat(msgEnviar, p1);
     strcat(msgEnviar, ",");
     strcat(msgEnviar, p2);
-    strcat(msgEnviar, ").\n");
+    strcat(msgEnviar, ").\n");*/
+    sprintf(msgEnviar, "227 entrando em modo passivo (%s,%s,%s).\n", ipEnvia, p1, p2);
+    printf("P1: %s\nP2: %s\n", p1, p2);
     //strcat(msgEnviar, "\0");
+    //msgEnviar[strlen(msgEnviar)] = '\0';
+    while(returnConData() == 0) {printf("Teste\n");}
+
     printf("PASV thread esperando conexao!\n");
     printf("MENSAGEM ENVIAR: %s\n", msgEnviar);
     write(cliente, msgEnviar, strlen(msgEnviar)+1);
@@ -290,9 +298,10 @@ int opPasv(int cliente, int porta, char ipCliente[]){
 }
 
 void *chamadaThreadData(void *arg){
-    struct argus *args = arg;
+    struct argus *args2 = arg;
     printf("PASV thread dados iniciada\n");
-    conexaoModoPassivo(args->port);
+    printf("PROTA AQUIIIIII: %i\n", args2->port);
+    conexaoModoPassivo(args2->port);
 }
 
 int opCwd(int cliente, int status, char pasta[]){

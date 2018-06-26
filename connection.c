@@ -14,6 +14,8 @@
 int dataCon1;
 int status = 0;
 int statusThread();
+int controleConData=0;
+
 
 int iniciarConexaoDados(int cliente, int port, char ipCliente[]){
     int dataCon;
@@ -58,8 +60,10 @@ void conexaoModoPassivo(int port){
 
     bind(s, (struct sockaddr *)&self, sizeof(self));
     listen(s, 5);
-    printf("PASV aguardando conexão do cliente\n");
+    printf("PASV aguardando conexão do cliente na porta %i\n", port);
+    controleConData = 1;
     dataCon1 = accept(s, (struct sockaddr *)&client, &addrlen);
+    controleConData=0;
     status = 1;
     printf("PASV cliente se conectou\n");
     pthread_exit(NULL);
@@ -71,6 +75,29 @@ int retornarDataCon(){
     return dataCon1;
 }
 
+int returnConData(){
+    return controleConData;
+}
+
 int statusThread(){
     return status;
 }
+/*
+void conexaoModoPassivo(int port){
+    int s, client_s;
+    struct sockaddr_in self, client;
+    int addrlen = sizeof(client);
+    char msg_write[100], msg_read[100];
+    s = socket(AF_INET, SOCK_STREAM, 0);
+    bzero(&self, sizeof(self));
+    self.sin_family = AF_INET;
+    self.sin_port = htons(port);
+    self.sin_addr.s_addr = INADDR_ANY;
+    bind(s, (struct sockaddr*)&self, sizeof(self));
+    listen(s, 5);
+    printf("Aguardando conexão na porta: %i\n", port);
+    client_s = accept(s, (struct sockaddr*)&client, &addrlen);
+    return client_s;
+
+}
+*/
