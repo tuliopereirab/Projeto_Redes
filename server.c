@@ -187,7 +187,7 @@ int server(int maxTaxa){
         printf("Ip Cliente: %s\n", ipCliente);
         printf("Conexão solicitada\n");
         idTaxas = busca_ip(ipCliente);
-        printf("Retornou %i\n", idTaxas);
+        //printf("Retornou %i\n", idTaxas);
         if(idTaxas == -1){
             idTaxas = regenciaAdd_ip(ipCliente);
         }
@@ -817,13 +817,9 @@ char* verificarString(char pasta[]){
 
 int regenciaAdd_ip(char ip[]){
     int id;
-    printf("Entrou regencia!\n");
     id = acharVazio_ip();
-    printf("Entrou regencia 2!\n");
     if(id == -1){
-        printf("Entrou regencia3!\n");
         id = criar_ip(ip);
-        printf("Entrou regencia4!\n");
     }else{
         id = adicionar_ip(ip, id);
     }
@@ -831,11 +827,9 @@ int regenciaAdd_ip(char ip[]){
 }
 int busca_ip(char ip[]){
     int i;
-    printf("Chegou aqui!\n");
     if(valIps == 0){
         return -1;           // -1 mostra que o ip ainda não está no vetor
     }else{
-        printf("Entra aqui\n");
         for(i=0;i<valIps;i++)
             if(controleTaxas[i].status == 1)
                 if((strcmp(controleTaxas[i].ip, ip)) == 0)
@@ -846,7 +840,7 @@ int busca_ip(char ip[]){
 int criar_ip(char ip[]){
     int taxaCliente;
     taxaCliente = verificaIp(ip);
-    printf("Taxa criar: %i\n", taxaCliente);
+    //printf("Taxa criar: %i\n", taxaCliente);
     if(taxaCliente == -1)
         taxaCliente = taxaPADRAO;
     if(valIps == 0){
@@ -861,7 +855,7 @@ int criar_ip(char ip[]){
     controleTaxas[valIps-1].maxTaxa = taxaCliente;
     controleTaxas[valIps-1].taxaAtual = 0;
     controleTaxas[valIps-1].cOnline = 0;
-    printf("AQUI: %i\n", controleTaxas[valIps-1].cOnline);
+    //printf("AQUI: %i\n", controleTaxas[valIps-1].cOnline);
     return valIps-1;      // retorna o id
 }
 

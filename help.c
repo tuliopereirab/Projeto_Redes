@@ -19,7 +19,8 @@ void ajuda(){
     printf("\t- './Server -ai <taxa_cliente> <ip_cliente>': adiciona ou atualiza a taxa de um endereço IP no arquivo de taxas máximas.\n");
     printf("\t- './Server --addip <taxa_cliente> <ip_cliente>': adiciona ou atualiza a taxa de um endereço IP no arquivo de taxas máximas.\n");
     printf("-----------------------------------------------\n");
-    printf("** TAXA MÁXIMA DE TRANSFERENCIA: o valor da taxa de transferência deve ser passado em Mbps.\n");
+    printf("** TAXA MÁXIMA DE TRANSFERENCIA: o valor da taxa de transferência deve ser passado em Kbps.\n");
+    printf("** TAXA MÁXIMA DO IP: o valor de taxa de transferência por IP deve ser passado em Kbps.\n");
     printf("===========================================================\n");
     system(EXIT_SUCCESS);
 }

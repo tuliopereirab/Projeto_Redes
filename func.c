@@ -445,17 +445,16 @@ int opPut(int cliente, char nomeArquivo[], char ipCliente[], int port, int passi
     int soma =0;
     printf("TAMANHO: %i\n", tam);
     char *buffer;
-    buffer = malloc(sizeof(char)*8*tam);
+    buffer = malloc(sizeof(char)*tam);
     //buffer = (char*)malloc(sizeof(char)*tam+1);
     printf("Iniciando recebimento!\n");
-    printf("Put recebendo a %i\n", *maxTaxa);
+    printf("Put recebendo a %i Kbps\n", *maxTaxa*8/1000);
     int offset1 = 0;
-    while((len=recv(dataCon, buffer, 1000000, NULL) > 0)){
+    while((len=recv(dataCon, buffer, *maxTaxa, NULL)) > 0){
         fwrite(buffer, sizeof(int), len, received_file);
         printf("Enviados: %i KBytes (ou %i Kbits) para %s\tOffset: %i\n", len/1000, len*8/1000, ipCliente, offset1);
         sleep(1);
         offset1++;
-        //sleep(1);
     }
     fclose(received_file);
     close(dataCon);

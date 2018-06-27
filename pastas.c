@@ -32,7 +32,7 @@ int main(){
 */
 int vPasta(char pasta[]){
     int i, status, val = contarPastas(pasta);
-    printf("ValPastas: %i\n", val);
+    //printf("ValPastas: %i\n", val);
     status = chdir(pasta);
     if(status == 0) sairPasta(pasta);
     return status;
@@ -61,7 +61,7 @@ int ePasta(char pasta[]){
 int sairPasta(char pasta[]){
     int i;
     int val = contarPastas(pasta);
-    printf("Valor: %i\n", val);
+    //printf("Valor: %i\n", val);
     for(i=val; i>0; i--){
         chdir("..");
     }

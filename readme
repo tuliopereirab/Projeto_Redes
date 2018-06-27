@@ -190,3 +190,7 @@ solicitando para que a página de ajuda seja acessada.
 conectar, será definida uma taxa máxima de cliente padrão para ele. Para alterar
 a taxa de cliente padrão, basta modificar o valor que consta na linha 19 do
 arquivo 'server.c'.
+
+**** Tanto a TAXA_MAXIMA_SERVIDOR quanto a TAXA_CLIENTE devem ser digitadas em
+Kbps e salvarão no arquivo em Bytes, ou seja:
+        Bytes = Kbps*1000/8;
