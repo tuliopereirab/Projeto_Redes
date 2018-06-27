@@ -191,7 +191,7 @@ int server(int maxTaxa){
         if(idTaxas == -1){
             idTaxas = regenciaAdd_ip(ipCliente);
         }
-        printf("Taxa de transferencia do cliente %s setada para %i\n", ipCliente, controleTaxas[idTaxas].maxTaxa);
+        printf("Taxa de transferencia do cliente %s setada para %i\n", ipCliente, controleTaxas[idTaxas].maxTaxa*8/1000);
         args.idCliente = idCliente;
         args.cliente = client_s;
         args.passiveMode = passiveMode;

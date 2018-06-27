@@ -66,24 +66,29 @@ int adicionarArquivo(int taxa, char ip[]){
         clientes[numIps-1].taxa = taxa;
         valIp = ipVar(ip);
         strcpy(clientes[numIps-1].ip, valIp);
+        status = numIps-1;
         //printf("Mostrar IP Struct: %s\n", clientes[numIps-1].ip);
     }else{
         printf("Cliente já está na lista, atualizando taxa...\n");
         clientes[status].taxa = taxa;
     }
-    escreverNoArquivo();
+    escreverNoArquivo(status);
     printf("Arquivo atualizado com sucesso!\n");
     return 1;
 }
 
-void escreverNoArquivo(){
+void escreverNoArquivo(int idEscrito){
     FILE *arquivo;
     int i;
     arquivo = fopen("gerenciaTaxas", "w+");
     fprintf(arquivo, "%i\n", numIps);
     for(i=0;i<numIps; i++){
         //printf("Escrevendo..\t%i\t%s\n", clientes[i].taxa, clientes[i].ip);
-        fprintf(arquivo, "%i %s", clientes[i].taxa, clientes[i].ip);
+        if(i == idEscrito)
+            fprintf(arquivo, "%i %s", clientes[i].taxa*1000/8, clientes[i].ip);
+        else
+            fprintf(arquivo, "%i %s", clientes[i].taxa, clientes[i].ip);
+
         if(i != (numIps-1))
             fprintf(arquivo, "\n");
     }

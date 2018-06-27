@@ -442,15 +442,20 @@ int opPut(int cliente, char nomeArquivo[], char ipCliente[], int port, int passi
     FILE *received_file;
     received_file = fopen(nomeArquivo, "w+");
     int len, tam = *maxTaxa;
+    int soma =0;
     printf("TAMANHO: %i\n", tam);
     char *buffer;
-    buffer = (char*)malloc(sizeof(char)*tam);
+    buffer = malloc(sizeof(char)*8*tam);
+    //buffer = (char*)malloc(sizeof(char)*tam+1);
     printf("Iniciando recebimento!\n");
-    while((len=recv(dataCon, buffer, *maxTaxa, 0) > 0)){
-        printf("Recebeu!\n");
-        fwrite(buffer, sizeof(char), len, received_file);
-        printf("Receive %i bytes\n", len);
+    printf("Put recebendo a %i\n", *maxTaxa);
+    int offset1 = 0;
+    while((len=recv(dataCon, buffer, 1000000, NULL) > 0)){
+        fwrite(buffer, sizeof(int), len, received_file);
+        printf("Enviados: %i KBytes (ou %i Kbits) para %s\tOffset: %i\n", len/1000, len*8/1000, ipCliente, offset1);
         sleep(1);
+        offset1++;
+        //sleep(1);
     }
     fclose(received_file);
     close(dataCon);
@@ -511,16 +516,24 @@ int opGet(int cliente, char ipCliente[], int port, char nomeArquivo[], int passi
         tamanho = 0;
     //write(dataCon, &tamanho, sizeof(int));
     int sent_bytes = 0;
-    int offset = 0;
+    int offset1 = 0;
     /*if(tamanho){
         sendfile(dataCon, arquivo, NULL, tamanho);
     }*/
     //printf("Bytes enviados: %i\n", sent_bytes);
-    printf("GET enviando a taxa de %i Bytes por segundo\n", *maxTaxa);
+    //printf("GET enviando a taxa de %i Bytes por segundo\n", (*maxTaxa)*8/1000);
+    clock_t temp1;
+    int offset = 0;
+    temp1 = clock();
     while((sent_bytes = sendfile(dataCon, arquivo, NULL, *maxTaxa)) > 0){
-        printf("Bytes enviados: %i\n", sent_bytes);
-        printf("Enviou");
-        sleep(1);
+        printf("Enviados: %i KBytes (ou %i Kbits) para %s\tOffset: %i\n", sent_bytes/1000, sent_bytes*8/1000, ipCliente, offset1);
+        //printf("Enviou");
+        //printf("MAX TAXA: %i\n", *maxTaxa);
+        //printf("Tempo espera: %i microseconds\n", 1000000-(((clock()-temp1)/CLOCKS_PER_SEC)*1000000));
+        //printf("VALOR DECRESCIDO: %i\n", ((clock() - temp1)/CLOCKS_PER_SEC)*1000000);
+        usleep(1000000 - ((clock() - temp1)/CLOCKS_PER_SEC)*1000000);           // usleep(microseconds);
+        temp1 = clock();
+        offset1++;
     }
     /*
     tamanho = strlen(arquivo);
