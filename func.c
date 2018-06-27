@@ -438,7 +438,7 @@ int opPut(int cliente, char nomeArquivo[], char ipCliente[], int port, int passi
     /*fileh = open(nomeArquivo, O_CREAT | O_EXCL | O_WRONLY, 0666);
     write(fileh, arquivo, tamanho, 0);
     close(fileh);*/
-
+/*
     FILE *received_file;
     received_file = fopen(nomeArquivo, "w+");
     int len, tam = *maxTaxa;
@@ -458,7 +458,23 @@ int opPut(int cliente, char nomeArquivo[], char ipCliente[], int port, int passi
     }
     fclose(received_file);
     close(dataCon);
-
+*/
+    int tam = *maxTaxa;
+    int offset1=0;
+    char *buffer = malloc(sizeof(char)*tam);
+    FILE *arq = fopen(nomeArquivo, "w");
+    int n;
+    while(1){
+        n = read(dataCon, buffer, *maxTaxa);
+        printf("Enviados: %i KBytes (ou %i Kbits) para %s\tOffset: %i\n", n/1000, n*8/1000, ipCliente, offset1);
+        fwrite(buffer, sizeof(char), n, arq);
+        //printf("Leu: %s\n", vet[i-1].byte);
+        if(n <= 0 || n == -1)
+            break;
+        offset1++;
+        sleep(1);
+    }
+    fclose(arq);
     strcpy(msgEnvia, "250 arquivo recebido\n");
     write(cliente, msgEnvia, strlen(msgEnvia)+1);
     printf("PUT arquivo recebido\n");
